@@ -1,0 +1,6 @@
+.authentication-button:hover {
+  color: white;
+  box-shadow: 0 0 20px rgba(100, 111, 203, 0.6);
+  background-color: rgba(100, 111, 203, 1);
+  width: auto;
+}
