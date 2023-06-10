@@ -1,4 +1,5 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
+import { getUser } from "../API/user";
 
 type UserContextProps = {
   children: React.ReactNode;
@@ -51,6 +52,32 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
     phoneNumber: "",
     isPhoneNumberVerified: false,
   });
+
+  useEffect(() => {
+    if (localStorage.getItem("accessToken")) {
+      const fetchUserDetails = async () => {
+        try {
+          const response = await getUser();
+
+          const userDetails = response.data.responseData;
+
+          setUserData({
+            firstName: userDetails.firstName,
+            lastName: userDetails.lastName,
+            userName: userDetails.userName,
+            email: userDetails.email,
+            isEmailVerified: userDetails.isEmailVerified,
+            phoneNumber: userDetails.phoneNumber,
+            isPhoneNumberVerified: userDetails.isPhoneNumberVerified,
+          });
+        } catch (error) {
+          console.error("Failed to fetch user details:", error);
+        }
+      };
+
+      fetchUserDetails();
+    }
+  }, []);
 
   return (
     <UserContext.Provider

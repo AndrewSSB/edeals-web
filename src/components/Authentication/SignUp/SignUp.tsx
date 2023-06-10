@@ -165,7 +165,12 @@ export default function SignUp() {
           }}
         >
           <div style={{ margin: "-50px 0 0px 0" }}>
-            <LogoImage src={logo} alt="Logo" />
+            <LogoImage
+              src={logo}
+              alt="Logo"
+              onClick={() => navigate("/")}
+              style={{ cursor: "pointer" }}
+            />
           </div>
           <Typography
             component="h6"

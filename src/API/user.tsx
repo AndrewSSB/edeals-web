@@ -3,7 +3,7 @@ import { ApiUrls } from "./Routes";
 
 export const getUser = async () => {
   const response = await axios.get(`${ApiUrls.userInfo}`, {
-    headers: { Authorization: `Bearer ${localStorage.getItem("userToken")}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
   });
 
   return response;

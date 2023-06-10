@@ -129,7 +129,12 @@ export default function SignIn() {
           }}
         >
           <div style={{ margin: "-25px 0 20px 0" }}>
-            <LogoImage src={logo} alt="Logo" />
+            <LogoImage
+              src={logo}
+              alt="Logo"
+              onClick={() => navigate("/")}
+              style={{ cursor: "pointer" }}
+            />
           </div>
           <Typography
             component="h6"

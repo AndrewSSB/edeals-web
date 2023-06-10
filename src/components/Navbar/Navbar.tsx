@@ -16,12 +16,21 @@ import {
   SearchContainer,
   SearchInput,
 } from "./NavbarElements";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { DropdownContent } from "./DropdownContent";
 import { useNavigate } from "react-router-dom";
+import { AutenticationButtons } from "../CustomButtons/CustomButtons";
+import { UserContext } from "../../context/UserContext";
 
-export const Navbar = () => {
+interface NavBarProps {
+  isAuthenticated: Boolean;
+}
+
+export const Navbar = (props: NavBarProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const { userData } = useContext(UserContext);
+
+  const navigate = useNavigate();
 
   return (
     <NavbarContainer position="static" color="default">
@@ -74,7 +83,7 @@ export const Navbar = () => {
               <ArrowDropDownIcon sx={{ color: "black" }} />
             </NoHoverIconButton>
 
-            {isHovered && (
+            {isHovered && !props.isAuthenticated && (
               <div
                 style={{
                   position: "absolute",
@@ -89,6 +98,37 @@ export const Navbar = () => {
                 }}
               >
                 <DropdownContent />
+              </div>
+            )}
+
+            {isHovered && props.isAuthenticated && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "100%",
+                  right: 0,
+                  left: "auto",
+                  width: "200px",
+                  backgroundColor: "white",
+                  padding: "20px",
+                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.15)",
+                  zIndex: 1,
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: "15px",
+                    marginBottom: "20px",
+                    textAlign: "center",
+                  }}
+                >
+                  Bun venit, {userData.userName}
+                </Typography>
+                <AutenticationButtons
+                  buttonText="Vezi profilul"
+                  buttonWidth="100%"
+                  onClick={() => navigate("/profil")}
+                />
               </div>
             )}
           </div>

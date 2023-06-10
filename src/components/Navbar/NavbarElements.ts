@@ -54,3 +54,15 @@ export const ButtonGap = styled("div")`
 export const PopoverContent = styled("div")`
   padding: 8px;
 `;
+
+export const DropdownStyle = {
+  position: "absolute",
+  top: "100%",
+  right: 0,
+  left: "auto",
+  width: "300px",
+  backgroundColor: "white",
+  padding: "20px",
+  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.15)",
+  zIndex: 1,
+};
