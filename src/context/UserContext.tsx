@@ -23,6 +23,8 @@ type UserContextType = {
   setEmail: (value: string) => void;
   userName: string | null;
   setUserName: (value: string) => void;
+  phoneNumber: string | null;
+  setPhoneNumber: (value: string) => void;
   token: string | null;
   setToken: (value: string) => void;
   userData: User;
@@ -38,6 +40,7 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
   const [lastName, setLastName] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
+  const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [userData, setUserData] = useState<User>({
     firstName: "",
@@ -60,6 +63,8 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
         setEmail,
         userName,
         setUserName,
+        phoneNumber,
+        setPhoneNumber,
         token,
         setToken,
         userData,

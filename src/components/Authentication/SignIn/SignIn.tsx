@@ -20,7 +20,7 @@ import { LogoImage } from "../../Navbar/NavbarElements";
 import logo from "../../../images/logo.png";
 import { AutenticationButtons } from "../../CustomButtons/CustomButtons";
 
-function Copyright(props: any) {
+export const Copyright = (props: any) => {
   return (
     <Typography
       variant="body2"
@@ -30,13 +30,13 @@ function Copyright(props: any) {
     >
       {"Copyright © "}
       <Link color="inherit" href="https://mui.com/">
-        Your Website
+        e-Deals
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}
     </Typography>
   );
-}
+};
 
 const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -65,6 +65,8 @@ export default function SignIn() {
     try {
       const response = await loginUser(userName, email, password);
 
+      setToken(response.data.responseData.accessToken);
+
       localStorage.setItem(
         "accessToken",
         response.data.responseData.accessToken
@@ -86,6 +88,14 @@ export default function SignIn() {
 
   const handleCloseSnackbar = () => {
     setError(null);
+  };
+
+  const toSignUp = () => {
+    navigate("/signup");
+  };
+
+  const toForgotPassword = () => {
+    navigate("/forgot-password");
   };
 
   return (
@@ -121,15 +131,19 @@ export default function SignIn() {
           <div style={{ margin: "-25px 0 20px 0" }}>
             <LogoImage src={logo} alt="Logo" />
           </div>
-          <Typography component="h1" variant="h5" sx={{ marginTop: "20px" }}>
-            Sign in
+          <Typography
+            component="h6"
+            variant="h6"
+            sx={{ marginTop: "20px", fontSize: "15px" }}
+          >
+            Contectează-te în contul tău e-Deals
           </Typography>
           <Box sx={{ mt: 1, display: "flex", flexDirection: "column" }}>
             <TextField
               margin="normal"
               required
               id="email"
-              label="Email Address or Username"
+              label="Adresa de email sau nume de utilizator"
               name="email"
               autoComplete="email"
               autoFocus
@@ -140,7 +154,7 @@ export default function SignIn() {
               margin="normal"
               required
               name="password"
-              label="Password"
+              label="Parola"
               type="password"
               id="password"
               autoComplete="current-password"
@@ -163,13 +177,21 @@ export default function SignIn() {
             </div>
             <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2" sx={{ color: "#646FCB" }}>
-                  Forgot password?
+                <Link
+                  variant="body2"
+                  onClick={toForgotPassword}
+                  sx={{ color: "#646FCB", cursor: "pointer" }}
+                >
+                  Ai uitat parola?
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="#" variant="body2" sx={{ color: "#646FCB" }}>
-                  {"Don't have an account? Sign Up"}
+                <Link
+                  variant="body2"
+                  onClick={toSignUp}
+                  sx={{ color: "#646FCB", cursor: "pointer" }}
+                >
+                  Nu ai cont? Înregistrează-te aici
                 </Link>
               </Grid>
             </Grid>

@@ -7,8 +7,7 @@ export const registerUser = async (
   userName: string,
   email: string,
   phoneNumber: string,
-  password: string,
-  confirmPassword: string
+  password: string
 ) => {
   const response = await instance.post(`${ApiUrls.register}`, {
     firstName: firstName,
@@ -17,7 +16,6 @@ export const registerUser = async (
     email: email,
     phoneNumber: phoneNumber,
     password: password,
-    confirmPassword: confirmPassword,
   });
 
   return response;
