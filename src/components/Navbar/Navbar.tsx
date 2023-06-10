@@ -18,6 +18,7 @@ import {
 } from "./NavbarElements";
 import { useState } from "react";
 import { DropdownContent } from "./DropdownContent";
+import { useNavigate } from "react-router-dom";
 
 export const Navbar = () => {
   const [isHovered, setIsHovered] = useState(false);

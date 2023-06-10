@@ -3,12 +3,16 @@ import "./CustomButtons.css";
 interface AuthButtonProps {
   buttonText: string;
   buttonWidth?: string | number;
+  type?: "button" | "submit" | "reset";
+  onClick?: () => void;
 }
 
 export const AutenticationButtons = (props: AuthButtonProps) => {
   return (
     <button
       className="authentication-button"
+      type={props.type}
+      onClick={props.onClick}
       style={{
         cursor: "pointer",
         border: "0",

@@ -1,8 +1,19 @@
 import { Typography } from "@mui/material";
 import { AutenticationButtons } from "../CustomButtons/CustomButtons";
 import AccountBoxTwoToneIcon from "@mui/icons-material/AccountBoxTwoTone";
+import { useNavigate } from "react-router-dom";
 
 export const DropdownContent = () => {
+  const navigate = useNavigate();
+
+  const signIn = () => {
+    navigate("/signin");
+  };
+
+  const signUp = () => {
+    navigate("/signup");
+  };
+
   return (
     <div
       style={{
@@ -26,8 +37,16 @@ export const DropdownContent = () => {
           justifyContent: "space-between",
         }}
       >
-        <AutenticationButtons buttonText="Intra în cont" buttonWidth="40%" />
-        <AutenticationButtons buttonText="Înregistrează-te" buttonWidth="50%" />
+        <AutenticationButtons
+          buttonText="Intra în cont"
+          buttonWidth="40%"
+          onClick={signIn}
+        />
+        <AutenticationButtons
+          buttonText="Înregistrează-te"
+          buttonWidth="50%"
+          onClick={signUp}
+        />
       </div>
     </div>
   );
