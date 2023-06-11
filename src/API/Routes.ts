@@ -4,6 +4,13 @@ type apiUrls = {
   logout: string;
   userInfo: string;
   getProducts: string;
+  addFavorite: string;
+  deleteFavorite: string;
+  getFavorite: string;
+  getCartItems: string;
+  addCartItem: string;
+  deleteCartItem: string;
+  getShoppingSession: string;
 };
 
 export const ApiUrls: apiUrls = {
@@ -11,5 +18,15 @@ export const ApiUrls: apiUrls = {
   register: "http://40.113.124.53:5000/core/api/authentication/register",
   logout: "http://40.113.124.53:5000/core/api/authentication/logout",
   userInfo: "http://40.113.124.53:5000/core/api/user/info",
+
   getProducts: "http://40.113.124.53:5000/catalog/api/product/all",
+
+  addFavorite: "http://40.113.124.53:5000/catalog/api/favorites",
+  deleteFavorite: "http://40.113.124.53:5000/catalog/api/favorites",
+  getFavorite: "http://40.113.124.53:5000/catalog/api/favorites",
+
+  getShoppingSession: "http://40.113.124.53:5000/catalog/api/shoppingsession",
+  getCartItems: "http://40.113.124.53:5000/catalog/api/cartitem/all",
+  addCartItem: "http://40.113.124.53:5000/catalog/api/cartitem",
+  deleteCartItem: "http://40.113.124.53:5000/catalog/api/cartitem",
 };

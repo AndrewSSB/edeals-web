@@ -1,4 +1,3 @@
-import { useContext } from "react";
 import { Navbar } from "../Navbar/Navbar";
 import { SubNavBar } from "../Navbar/SubNavbar";
 import { Box } from "@mui/material";

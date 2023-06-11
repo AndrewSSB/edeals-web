@@ -13,6 +13,26 @@ export const ProductPage = () => {
           <ProductCard key={product.productId} product={product} />
         ))}
       </Grid>
+      {products.length === 0 && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "200px",
+          }}
+        >
+          <div
+            style={{ color: "#646FCB", fontSize: "20px", fontWeight: "600" }}
+          >
+            Ne pare rău, nu am gasit produsul introdus.
+            <ul>
+              <li>Verifica daca ai scris corect termenii.</li>
+              <li>Încearcă din nou, folosind o cautare mai generala.</li>
+            </ul>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

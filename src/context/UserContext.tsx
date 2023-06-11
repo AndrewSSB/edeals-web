@@ -71,10 +71,11 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
             isPhoneNumberVerified: userDetails.isPhoneNumberVerified,
           });
         } catch (error: any) {
+          console.log("asfasfa");
           if (error.response && error.response.status === 401) {
             localStorage.removeItem("accessToken");
           }
-          console.log("Failed to fetch user details:", error);
+          console.error("Failed to fetch user details:", error);
         }
       };
 
