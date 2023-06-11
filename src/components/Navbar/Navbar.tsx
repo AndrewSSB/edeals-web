@@ -33,7 +33,7 @@ export const Navbar = (props: NavBarProps) => {
   const navigate = useNavigate();
 
   return (
-    <NavbarContainer position="static" color="default">
+    <NavbarContainer position="sticky" color="default">
       <Toolbar>
         <NoHoverIconButton
           size="large"
@@ -93,7 +93,7 @@ export const Navbar = (props: NavBarProps) => {
                   width: "300px",
                   backgroundColor: "white",
                   padding: "20px",
-                  boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.15)",
+                  boxShadow: "0px 2px 4px rgba(100, 111, 203, 0.6)",
                   zIndex: 1,
                 }}
               >

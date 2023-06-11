@@ -3,7 +3,7 @@ type apiUrls = {
   register: string;
   logout: string;
   userInfo: string;
-  products: string;
+  getProducts: string;
 };
 
 export const ApiUrls: apiUrls = {
@@ -11,5 +11,5 @@ export const ApiUrls: apiUrls = {
   register: "http://40.113.124.53:5000/core/api/authentication/register",
   logout: "http://40.113.124.53:5000/core/api/authentication/logout",
   userInfo: "http://40.113.124.53:5000/core/api/user/info",
-  products: "http://40.113.124.53:5000/catalog/api/product/all",
+  getProducts: "http://40.113.124.53:5000/catalog/api/product/all",
 };

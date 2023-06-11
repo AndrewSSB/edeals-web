@@ -8,6 +8,7 @@ import SignIn from "./components/Authentication/SignIn/SignIn";
 import SignUp from "./components/Authentication/SignUp/SignUp";
 import { NotFoundPage } from "./components/NotFound/NotFound";
 import { getUser } from "./API/user";
+import { ProductContextProvider } from "./context/ProductsContext";
 
 const App = () => {
   return (
@@ -25,8 +26,10 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <UserContextProvider>
-    <Router>
-      <App />
-    </Router>
+    <ProductContextProvider>
+      <Router>
+        <App />
+      </Router>
+    </ProductContextProvider>
   </UserContextProvider>
 );
