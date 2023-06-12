@@ -1,4 +1,3 @@
-import { Grid } from "@mui/material";
 import { LittleProductCard } from "./LittleProductCard";
 import {
   Product,
@@ -15,8 +14,6 @@ interface LittlePageProps {
 
 export const LittleProductPage = (props: LittlePageProps) => {
   const { products } = useContext(ProductContext);
-
-  console.log(props.shoppingSession);
 
   return (
     <div

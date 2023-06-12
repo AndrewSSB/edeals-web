@@ -20,12 +20,19 @@ import { DropdownContent } from "./DropdownContent";
 import { useNavigate } from "react-router-dom";
 import { AutenticationButtons } from "../CustomButtons/CustomButtons";
 import { UserContext } from "../../context/UserContext";
-import { getProducts } from "../../API/products";
+import {
+  getFavorites,
+  getProducts,
+  getShoppingSession,
+} from "../../API/products";
 import { ProductContext } from "../../context/ProductsContext";
 import { LittleProductPage } from "../Products/LitttleProdcutPage";
+import Payment from "../Payments/Payment";
 
 interface NavBarProps {
   isAuthenticated: Boolean;
+  isInBasketPage: Boolean;
+  isInFavoritePage: Boolean;
 }
 
 export const Navbar = (props: NavBarProps) => {
@@ -50,6 +57,37 @@ export const Navbar = (props: NavBarProps) => {
       handleSearch(search);
     }
   };
+
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      try {
+        const response = await getShoppingSession(1);
+
+        const responseData = response.data.responseData;
+        setShoppingSession(responseData);
+      } catch (error: any) {
+        console.error("Failed to fetch shopping session:", error);
+      }
+    };
+
+    fetchCartItems();
+  }, []);
+
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      try {
+        const response = await getFavorites();
+
+        const responseData = response.data.responseData;
+
+        setFavorites(responseData);
+      } catch (error: any) {
+        console.error("Failed to fetch favorite products:", error);
+      }
+    };
+
+    fetchFavorites();
+  }, []);
 
   const clearSearch = () => {
     setSearch("");
@@ -234,7 +272,7 @@ export const Navbar = (props: NavBarProps) => {
               </Typography>
               <ArrowDropDownIcon sx={{ color: "black" }} />
             </NoHoverIconButton>
-            {isFavoriteHovered && hasFavorite && (
+            {isFavoriteHovered && hasFavorite && !props.isInFavoritePage && (
               <div
                 style={{
                   backgroundColor: "#F7F7F7",
@@ -316,54 +354,56 @@ export const Navbar = (props: NavBarProps) => {
               </Typography>
               <ArrowDropDownIcon sx={{ color: "black" }} />
             </NoHoverIconButton>
-            {isBasketHovered && shoppingSession.cartItems.length > 0 && (
-              <div
-                style={{
-                  backgroundColor: "#F7F7F7",
-                  position: "absolute",
-                  top: "100%",
-                  right: 0,
-                  left: "auto",
-                  width: "300px",
-                  padding: "20px",
-                  boxShadow: "0px 2px 4px rgba(100, 111, 203, 0.6)",
-                  zIndex: 1,
-                }}
-              >
+            {isBasketHovered &&
+              shoppingSession.cartItems.length > 0 &&
+              !props.isInBasketPage && (
                 <div
                   style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    flexDirection: "column",
-                    alignItems: "flex-start",
+                    backgroundColor: "#F7F7F7",
+                    position: "absolute",
+                    top: "100%",
+                    right: 0,
+                    left: "auto",
+                    width: "300px",
+                    padding: "20px",
+                    boxShadow: "0px 2px 4px rgba(100, 111, 203, 0.6)",
+                    zIndex: 1,
                   }}
                 >
-                  <span style={{ color: "#2f366f", marginBottom: "10px" }}>
-                    Ultimele produse adăugate
-                  </span>
-                  <LittleProductPage
-                    showQuantity={true}
-                    shoppingSession={shoppingSession}
-                  />
                   <div
                     style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      flexDirection: "column",
                       alignItems: "flex-start",
-                      fontFamily: "sans-serif",
-                      fontSize: "15px",
-                      margin: "10px 0 0 0",
                     }}
                   >
-                    TOTAL: {shoppingSession.total} lei
+                    <span style={{ color: "#2f366f", marginBottom: "10px" }}>
+                      Ultimele produse adăugate
+                    </span>
+                    <LittleProductPage
+                      showQuantity={true}
+                      shoppingSession={shoppingSession}
+                    />
+                    <div
+                      style={{
+                        alignItems: "flex-start",
+                        fontFamily: "sans-serif",
+                        fontSize: "15px",
+                        margin: "10px 0 0 0",
+                      }}
+                    >
+                      TOTAL: {shoppingSession.total} lei
+                    </div>
+                    <div style={{ margin: "8px 0" }}></div>
+                    <AutenticationButtons
+                      buttonText="Vezi produsele din coș"
+                      buttonWidth="100%"
+                      onClick={() => navigate("/basket")}
+                    />
                   </div>
-                  <div style={{ margin: "8px 0" }}></div>
-                  <AutenticationButtons
-                    buttonText="Vezi produsele din coș"
-                    buttonWidth="100%"
-                    onClick={() => navigate("/")}
-                  />
                 </div>
-              </div>
-            )}
+              )}
           </div>
         </RightIconsContainer>
       </Toolbar>

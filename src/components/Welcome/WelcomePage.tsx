@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import { Navbar } from "../Navbar/Navbar";
 import { SubNavBar } from "../Navbar/SubNavbar";
 import { Box } from "@mui/material";
@@ -15,7 +16,11 @@ export const WelcomePage = () => {
         flexDirection: "column",
       }}
     >
-      <Navbar isAuthenticated={isAuthenticated} />
+      <Navbar
+        isAuthenticated={isAuthenticated}
+        isInBasketPage={false}
+        isInFavoritePage={false}
+      />
       <SubNavBar />
 
       <ProductPage />

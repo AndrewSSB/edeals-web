@@ -11,6 +11,8 @@ type apiUrls = {
   addCartItem: string;
   deleteCartItem: string;
   getShoppingSession: string;
+
+  paymentIntent: string;
 };
 
 export const ApiUrls: apiUrls = {
@@ -29,4 +31,6 @@ export const ApiUrls: apiUrls = {
   getCartItems: "http://40.113.124.53:5000/catalog/api/cartitem/all",
   addCartItem: "http://40.113.124.53:5000/catalog/api/cartitem",
   deleteCartItem: "http://40.113.124.53:5000/catalog/api/cartitem",
+
+  paymentIntent: "http://40.113.124.53:5000/catalog/api/paymentcontroll",
 };
