@@ -1,0 +1,17 @@
+.SendBird {
+  height: 100vh;
+  width: 100vw;
+}
+
+.channel-wrap {
+  display: flex;
+  height: 100%;
+}
+
+.channel-list {
+  float: left;
+}
+
+.channel-chat {
+  width: 76%;
+}

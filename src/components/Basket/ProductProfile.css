@@ -1,0 +1,35 @@
+#discount {
+  font-weight: 500;
+  font-size: 14px;
+  height: 40px;
+  border-radius: 10px;
+  padding-left: 10px;
+  background-color: #f7f7f7;
+  border: none;
+  border-bottom: 1px solid #e5e5e5;
+  outline: none;
+}
+
+#discont:focus {
+  border-bottom: 1px solid #646fcb;
+  -webkit-transition: 0.1s;
+  transition: 0.5s;
+}
+
+#discountButton {
+  font-family: monospace;
+  background-color: #f3f7fe;
+  color: #646fcb;
+  border: none;
+  border-radius: 8px;
+  width: 70px;
+  height: 30px;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+#discountButton:hover {
+  box-shadow: 0 0 20px rgba(100, 111, 203, 0.6);
+  background-color: rgba(100, 111, 203, 1);
+  color: #fff;
+}

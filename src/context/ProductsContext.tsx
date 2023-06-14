@@ -1,10 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import {
-  getCartItems,
-  getFavorites,
-  getProducts,
-  getShoppingSession,
-} from "../API/products";
+import { getFavorites, getProducts, getShoppingSession } from "../API/products";
 
 type ProductContextProps = {
   children: React.ReactNode;

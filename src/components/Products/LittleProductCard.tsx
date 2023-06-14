@@ -10,13 +10,13 @@ import {
   getShoppingSession,
 } from "../../API/products";
 
-type ProductCardProps = {
+export interface ProductCardProps {
   showQuantity: boolean;
   quantity?: number;
   product: Product;
   cartItemId: number | string;
   isBasket: boolean;
-};
+}
 export const LittleProductCard = (props: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const { setShoppingSession, setFavorites } = useContext(ProductContext);

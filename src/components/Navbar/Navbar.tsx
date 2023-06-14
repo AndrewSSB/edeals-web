@@ -31,8 +31,8 @@ import Payment from "../Payments/Payment";
 
 interface NavBarProps {
   isAuthenticated: Boolean;
-  isInBasketPage: Boolean;
-  isInFavoritePage: Boolean;
+  isInBasketPage?: Boolean;
+  isInFavoritePage?: Boolean;
 }
 
 export const Navbar = (props: NavBarProps) => {
@@ -194,7 +194,7 @@ export const Navbar = (props: NavBarProps) => {
               </div>
             )}
 
-            {isHovered && props.isAuthenticated && (
+            {isHovered && props.isAuthenticated && userData.userName && (
               <div
                 style={{
                   position: "absolute",
@@ -305,7 +305,7 @@ export const Navbar = (props: NavBarProps) => {
                   <AutenticationButtons
                     buttonText="Vezi produsele favorite"
                     buttonWidth="100%"
-                    onClick={() => navigate("/")}
+                    onClick={() => navigate("/favorite")}
                   />
                 </div>
               </div>

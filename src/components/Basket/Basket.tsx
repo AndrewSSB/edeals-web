@@ -1,20 +1,16 @@
-import { Box, Grid } from "@mui/material";
-import { Navbar } from "../Navbar/Navbar";
+import { ProductContext } from "../../context/ProductsContext";
+import { ProductProfile } from "./ProductProfile";
+import { useContext } from "react";
 
 export const Basket = () => {
-  const isAuthenticated = localStorage.getItem("accessToken") ? true : false;
+  const handleApplyingDiscount = () => {};
+
   return (
-    <Box
-      sx={{
-        backgroundColor: "#f2f2f7",
-        minHeight: "100vh",
-      }}
-    >
-      <Navbar
-        isAuthenticated={isAuthenticated}
-        isInBasketPage={true}
-        isInFavoritePage={false}
-      />
-    </Box>
+    <ProductProfile
+      isInbasketPage={false}
+      isInFavoritePage={true}
+      basket="Coșul meu"
+      onClickFunction={handleApplyingDiscount}
+    />
   );
 };
