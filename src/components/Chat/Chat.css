@@ -1,0 +1,21 @@
+#message-input {
+  font-weight: 500;
+  color: black;
+  background-color: white;
+  box-shadow: 0 0 5px rgba(100, 111, 203, 0.6);
+  border-radius: 0.4vw;
+  border: none;
+  outline: none;
+  width: 80%;
+  height: 40px;
+  padding-left: 10px;
+  margin-left: 8px;
+}
+
+#message-input {
+  box-shadow: 0 0 5px rgba(100, 111, 203, 0.6);
+}
+
+#message-input:focus {
+  box-shadow: 0 0 0 0.1vw rgba(100, 111, 203, 0.6);
+}

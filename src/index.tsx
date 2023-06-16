@@ -17,6 +17,7 @@ import { Favorites } from "./components/Basket/Favorites";
 import { Basket } from "./components/Basket/Basket";
 import { Provider } from "react-redux";
 import { ChatComponent } from "./components/Chat/SignalR";
+import { ProductDetails } from "./components/ProductDetails/ProductDetails";
 
 const App = () => {
   return (
@@ -31,9 +32,10 @@ const App = () => {
               <Route path="/basket" element={<Basket />} />
               <Route path="/favorite" element={<Favorites />} />
               <Route path="/payment" element={<Payment />} />
-              <Route path="/test" element={<Test />} />
-              <Route path="/agora" element={<AgoraChat />} />
+              {/* <Route path="/test" element={<Test />} /> */}
+              {/* <Route path="/agora" element={<AgoraChat />} /> */}
               <Route path="/chat" element={<ChatComponent />} />
+              <Route path="/product" element={<ProductDetails />} />
               {/* <Route
                 path="/chat"
                 element={

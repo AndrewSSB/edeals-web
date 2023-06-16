@@ -13,6 +13,7 @@ export interface User {
   isEmailVerified: Boolean;
   phoneNumber: string;
   isPhoneNumberVerified: Boolean;
+  profileImage: string;
 }
 
 type UserContextType = {
@@ -30,6 +31,8 @@ type UserContextType = {
   setToken: (value: string) => void;
   userData: User;
   setUserData: (value: User) => void;
+  profileImage: string;
+  setProfileImage: (value: string) => void;
 };
 
 export const UserContext = createContext<UserContextType>(
@@ -51,7 +54,9 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
     isEmailVerified: false,
     phoneNumber: "",
     isPhoneNumberVerified: false,
+    profileImage: "",
   });
+  const [profileImage, setProfileImage] = useState<string>("");
 
   useEffect(() => {
     if (localStorage.getItem("accessToken")) {
@@ -69,6 +74,7 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
             isEmailVerified: userDetails.isEmailVerified,
             phoneNumber: userDetails.phoneNumber,
             isPhoneNumberVerified: userDetails.isPhoneNumberVerified,
+            profileImage: "",
           });
         } catch (error: any) {
           localStorage.removeItem("accessToken");
@@ -97,6 +103,8 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
         setToken,
         userData,
         setUserData,
+        profileImage,
+        setProfileImage,
       }}
     >
       {children}

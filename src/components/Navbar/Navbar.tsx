@@ -28,6 +28,7 @@ import {
 import { ProductContext } from "../../context/ProductsContext";
 import { LittleProductPage } from "../Products/LitttleProdcutPage";
 import Payment from "../Payments/Payment";
+import { getUser } from "../../API/user";
 
 interface NavBarProps {
   isAuthenticated: Boolean;
@@ -49,7 +50,7 @@ export const Navbar = (props: NavBarProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isFavoriteHovered, setIsFavoriteHovered] = useState(false);
   const [isBasketHovered, setIsBasketHovered] = useState(false);
-  const { userData } = useContext(UserContext);
+  const { userData, setUserData } = useContext(UserContext);
   const [search, setSearch] = useState("");
 
   const searchChange = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -112,6 +113,10 @@ export const Navbar = (props: NavBarProps) => {
 
   const hasFavorite = favorites.length > 0;
 
+  const goToWelcome = () => {
+    navigate("/");
+  };
+
   return (
     <NavbarContainer position="sticky" color="default">
       <Toolbar>
@@ -120,6 +125,7 @@ export const Navbar = (props: NavBarProps) => {
           edge="start"
           aria-label="logo"
           disableRipple
+          onClick={goToWelcome}
         >
           <LogoImage src={logo} alt="Logo" />
         </NoHoverIconButton>
@@ -176,7 +182,7 @@ export const Navbar = (props: NavBarProps) => {
               <ArrowDropDownIcon sx={{ color: "black" }} />
             </NoHoverIconButton>
 
-            {isHovered && !props.isAuthenticated && (
+            {isHovered && !props.isAuthenticated && !userData.userName && (
               <div
                 style={{
                   position: "absolute",

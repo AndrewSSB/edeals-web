@@ -83,7 +83,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             </ProductDescription>
             <Rating
               name="product-rating"
-              value={1}
+              value={Math.random() * (5 - 1) + 1}
               precision={0.5}
               readOnly
               style={{ fontSize: "18px", marginTop: "10px" }}
