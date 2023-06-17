@@ -5,6 +5,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "./Checkout";
 import { createPaymentIntent } from "../../API/payments";
 import "./Payment.css";
+import { useParams } from "react-router-dom";
 
 const stripePromise = loadStripe(
   "pk_test_51NHtSfG4Hk7olvlPhiMdV5X5pVGbGwREM0BVJVj91T6rag6yyHkWqzV0nNyVG9XIvDGVrxsdcLL5fxvWVvNXRSAE00Y6wwGRTq"
@@ -12,20 +13,26 @@ const stripePromise = loadStripe(
 
 export default function Payment() {
   const [clientSecret, setClientSecret] = useState<string>("");
+  const { shopingSessionId } = useParams();
 
   useEffect(() => {
-    const fetchFavorites = async () => {
-      try {
-        const response = await createPaymentIntent(24);
-        const responseData = response.data.responseData;
+    console.log(shopingSessionId);
 
-        setClientSecret(responseData.clientSecret);
+    const createPayment = async () => {
+      try {
+        if (shopingSessionId) {
+          const response = await createPaymentIntent(
+            shopingSessionId as unknown as number
+          );
+          const responseData = response.data.responseData;
+          setClientSecret(responseData.clientSecret);
+        }
       } catch (error: any) {
         console.error("Failed to fetch client secret:", error);
       }
     };
 
-    fetchFavorites();
+    createPayment();
   }, []);
 
   const options: StripeElementsOptions = {

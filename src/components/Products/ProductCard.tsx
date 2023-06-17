@@ -12,6 +12,8 @@ import {
   getFavorites,
   getShoppingSession,
 } from "../../API/products";
+import { useNavigate } from "react-router-dom";
+import { ProductDetails } from "../ProductDetails/ProductDetails";
 
 type ProductCardProps = {
   product: Product;
@@ -20,6 +22,8 @@ type ProductCardProps = {
 export const ProductCard = ({ product }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState<Boolean>(false);
   const { setShoppingSession, setFavorites } = useContext(ProductContext);
+
+  const navigate = useNavigate();
 
   const handleFavorites = async (value: string) => {
     try {
@@ -49,11 +53,16 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     }
   };
 
+  const handleProductDetails = (productId: string) => {
+    navigate(`/product/${productId}`);
+  };
+
   return (
     <Grid item xs={6} sm={6} md={2} lg={2}>
       <Card
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onClick={() => handleProductDetails(product.productId)}
         style={{
           border: "none",
           boxShadow: isHovered

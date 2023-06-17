@@ -32,14 +32,33 @@ export interface message {
 }
 
 const myChats: CSSProperties = {
-  marginRight: "20px",
-  marginTop: "10px",
+  marginRight: "5px",
+  marginLeft: "45px",
   textAlign: "right",
+  whiteSpace: "pre-wrap",
+  wordWrap: "break-word",
 };
 
 const otherChats: CSSProperties = {
-  marginLeft: "20px",
+  marginLeft: "10px",
+  marginRight: "45px",
   textAlign: "left",
+  whiteSpace: "pre-wrap",
+  wordWrap: "break-word",
+};
+
+const myMessages: CSSProperties = {
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "flex-end",
+  marginTop: "10px",
+};
+
+const otherPersonMessages: CSSProperties = {
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "flex-start",
+  marginTop: "10px",
 };
 
 export const ChatBox = (props: ChatBoxProps) => {
@@ -50,7 +69,12 @@ export const ChatBox = (props: ChatBoxProps) => {
   useEffect(() => {
     const fetchMessages = async () => {
       const response = await instance.get(
-        ApiUrls.messages + `/${props.channelId}`
+        ApiUrls.messages + `/${props.channelId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
       );
 
       setMessages(
@@ -105,7 +129,6 @@ export const ChatBox = (props: ChatBoxProps) => {
         sx={{
           backgroundColor: "#eaeaea",
           height: "40px",
-          borderRadius: "0 0 5px 5px",
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
@@ -123,13 +146,14 @@ export const ChatBox = (props: ChatBoxProps) => {
       <Box
         ref={messageContainerRef}
         sx={{
-          backgroundColor: "#F7F7F7",
+          backgroundColor: "#white",
           flex: 1,
           borderRadius: "5px 5px 0 0",
           display: "flex",
           flexDirection: "column",
           overflowY: "auto",
           padding: "10px",
+          marginBottom: "5px",
         }}
       >
         {messages.map((receivedMessage, index) => {
@@ -142,17 +166,47 @@ export const ChatBox = (props: ChatBoxProps) => {
 
           return (
             <div
-              key={index}
               style={
                 receivedMessage.sender === props.myUsername
-                  ? myChats
-                  : otherChats
+                  ? myMessages
+                  : otherPersonMessages
               }
             >
-              {receivedMessage.message}{" "}
-              <span style={{ fontSize: "10px", fontStyle: "italic" }}>
-                {formattedTime}
-              </span>
+              {receivedMessage.sender !== props.myUsername && (
+                <div>
+                  <span
+                    style={{
+                      fontSize: "10px",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    {formattedTime}
+                  </span>
+                </div>
+              )}
+
+              <div
+                key={index}
+                style={
+                  receivedMessage.sender === props.myUsername
+                    ? myChats
+                    : otherChats
+                }
+              >
+                {receivedMessage.message}{" "}
+              </div>
+              {receivedMessage.sender === props.myUsername && (
+                <div>
+                  <span
+                    style={{
+                      fontSize: "10px",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    {formattedTime}
+                  </span>
+                </div>
+              )}
             </div>
           );
         })}
@@ -162,7 +216,6 @@ export const ChatBox = (props: ChatBoxProps) => {
           backgroundColor: "#F7F7F7",
           marginTop: "auto",
           height: "60px",
-          borderRadius: "5px 5px 0 0",
           display: "flex",
           flexDirection: "row",
           alignItems: "center",

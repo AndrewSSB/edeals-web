@@ -5,8 +5,6 @@ import { Box } from "@mui/material";
 import { ProductPage } from "../Products/ProductPage";
 
 export const WelcomePage = () => {
-  const isAuthenticated = localStorage.getItem("accessToken") ? true : false;
-
   return (
     <Box
       sx={{
@@ -16,11 +14,7 @@ export const WelcomePage = () => {
         flexDirection: "column",
       }}
     >
-      <Navbar
-        isAuthenticated={isAuthenticated}
-        isInBasketPage={false}
-        isInFavoritePage={false}
-      />
+      <Navbar isInBasketPage={false} isInFavoritePage={false} />
       <SubNavBar />
 
       <ProductPage />

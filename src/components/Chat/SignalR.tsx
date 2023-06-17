@@ -6,18 +6,11 @@ interface message {
   sender: any;
   message: any;
 }
-
+// Realizarea conexiunii dintre client și server
 export const connectToHub = async () => {
   const connection = new signalR.HubConnectionBuilder()
     .withUrl(`http://40.113.124.53:5002/chat`, {})
     .build();
-
-  // connection.on("ReceiveMessage", (user, message) => {
-  //   console.log(`${user} sent a message: ${message}`);
-  //   const newMessage = { sender: user, message };
-  //   console.log(newMessage);
-  //   // setMessages((prevMessages) => [...prevMessages, newMessage]);
-  // });
 
   connection
     .start()
@@ -31,6 +24,7 @@ export const connectToHub = async () => {
   return connection;
 };
 
+// Create unei camere private de comunicare
 export const sendJoinChannel = async (
   connection: signalR.HubConnection | null,
   id: string
@@ -47,6 +41,7 @@ export const sendJoinChannel = async (
   }
 };
 
+// Parăsirea cemerei private
 export const sendLeaveChannel = async (
   connection: signalR.HubConnection | null,
   id: string
@@ -63,6 +58,7 @@ export const sendLeaveChannel = async (
   }
 };
 
+// Trimiterea mesajelor
 export const handleSendMessage = (
   connection: signalR.HubConnection,
   channelId: string,

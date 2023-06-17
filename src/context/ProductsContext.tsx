@@ -48,6 +48,8 @@ export interface CartItem {
   productPrice: string;
   quantity: number;
   shoppingSessionId: number;
+  description: string;
+  image: string;
 }
 
 export interface ShoppingSession {

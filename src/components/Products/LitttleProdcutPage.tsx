@@ -19,10 +19,8 @@ export const LittleProductPage = (props: LittlePageProps) => {
     <div
       style={{
         display: "flex",
-        justifyContent: "center",
         alignItems: "center",
         flexDirection: "column",
-        height: "100%",
       }}
     >
       {props.favorites &&

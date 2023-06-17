@@ -1,0 +1,43 @@
+.swiper-container {
+  display: flex;
+  flex-direction: column;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 600px;
+  cursor: grab;
+}
+
+.swiper-container:active {
+  cursor: grabbing;
+}
+
+@media (min-width: 1280px) {
+  .swiper-container {
+    margin-left: 8%;
+  }
+}
+
+.mySwiper {
+  width: 500px;
+  height: 500px;
+}
+
+.swiper-slide {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.swiper-slide img {
+  display: flex;
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+}
+
+.gray-line {
+  border: 1px solid #e0e0e0;
+  width: auto;
+}

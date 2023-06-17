@@ -61,22 +61,31 @@ export const LittleProductCard = (props: ProductCardProps) => {
       style={{
         border: "none",
         boxShadow: isHovered ? "0px 0px 10px rgba(100, 111, 203, 0.4)" : "none",
-        height: "60px",
-        width: "300px",
+        height: "100px",
+        width: "390px",
         display: "flex",
         margin: "5px 0px",
       }}
     >
-      <CardImage style={{ marginLeft: "10px" }}>
+      <CardImage
+        style={{
+          marginLeft: "10px",
+          width: "40px",
+          height: "40px",
+        }}
+      >
         <img
           src={props.product.images.mainImage}
           alt={props.product.name}
-          style={{ width: "60px", height: "60px", objectFit: "contain" }}
+          style={{
+            width: "80px",
+            height: "80px",
+          }}
         />
       </CardImage>
       <CardContent
         style={{
-          marginLeft: "60px",
+          marginLeft: "45px",
           cursor: "pointer",
           display: "flex",
           justifyContent: "space-between",
@@ -92,17 +101,20 @@ export const LittleProductCard = (props: ProductCardProps) => {
           style={{
             fontSize: "12px",
             paddingLeft: "2px",
-            maxWidth: "120px",
+            width: "160px",
           }}
         >
           {props.product.shortDescription}
         </ProductDescription>
-        <div>
+        <div
+          style={{ width: "40%", display: "flex", justifyContent: "flex-end" }}
+        >
           <div
             style={{
+              marginTop: "-30px",
+              marginRight: "-20px",
               display: "flex",
-              alignItems: "center",
-              marginTop: "-25px",
+              justifyContent: "flex-end",
             }}
           >
             {props.showQuantity && (
@@ -117,9 +129,13 @@ export const LittleProductCard = (props: ProductCardProps) => {
               variant="h6"
               style={{
                 fontSize: "12px",
-                marginLeft: "5px",
+                marginLeft: "-5px",
                 fontWeight: "bold",
                 color: "#646FCB",
+                width: "80px",
+                display: "flex",
+                marginRight: "20px",
+                justifyContent: "flex-end",
               }}
             >
               {props.product.price} Lei
@@ -130,13 +146,12 @@ export const LittleProductCard = (props: ProductCardProps) => {
               onClick={() => removeCartItem(props.cartItemId)}
               style={{
                 position: "absolute",
-                width: "25px",
-                height: "25px",
-                display: "flex",
-                alignItems: "center",
+                width: "30px",
+                height: "30px",
                 justifyContent: "center",
-                right: "30px",
-                left: "auto",
+                alignItems: "center",
+                display: "flex",
+                right: "42px",
                 marginTop: "10px",
                 backgroundColor: "#dbe1ff",
               }}

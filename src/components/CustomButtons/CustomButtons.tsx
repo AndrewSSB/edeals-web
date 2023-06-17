@@ -1,3 +1,4 @@
+import { CSSProperties } from "react";
 import "./CustomButtons.css";
 
 interface AuthButtonProps {
@@ -5,6 +6,7 @@ interface AuthButtonProps {
   buttonWidth?: string | number;
   type?: "button" | "submit" | "reset";
   onClick?: () => void;
+  style?: CSSProperties;
 }
 
 export const AutenticationButtons = (props: AuthButtonProps) => {
@@ -22,6 +24,7 @@ export const AutenticationButtons = (props: AuthButtonProps) => {
         padding: "10px 0px",
         transition: "0.4s",
         textAlign: "center",
+        ...props.style,
       }}
     >
       {props.buttonText}

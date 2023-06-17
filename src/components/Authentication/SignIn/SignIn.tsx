@@ -117,6 +117,7 @@ export default function SignIn() {
           height: "600px",
           minWidth: "500px",
           backgroundColor: "#FFFFFF",
+          boxShadow: "0px 0px 10px rgba(100, 111, 203, 0.3)",
         }}
       >
         <CssBaseline />

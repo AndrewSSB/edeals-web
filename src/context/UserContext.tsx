@@ -5,6 +5,16 @@ type UserContextProps = {
   children: React.ReactNode;
 };
 
+export interface Address {
+  country?: string;
+  city?: string;
+  region?: string;
+  postalCode?: string;
+  address?: string;
+  addressAditionally?: string;
+  mentiuni?: string;
+}
+
 export interface User {
   firstName: string;
   lastName: string;
@@ -14,6 +24,7 @@ export interface User {
   phoneNumber: string;
   isPhoneNumberVerified: Boolean;
   profileImage: string;
+  addresses: Address[];
 }
 
 type UserContextType = {
@@ -33,6 +44,8 @@ type UserContextType = {
   setUserData: (value: User) => void;
   profileImage: string;
   setProfileImage: (value: string) => void;
+  favoriteAddress: Address;
+  setFavoriteAddress: (value: Address) => void;
 };
 
 export const UserContext = createContext<UserContextType>(
@@ -55,36 +68,17 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
     phoneNumber: "",
     isPhoneNumberVerified: false,
     profileImage: "",
+    addresses: [],
   });
   const [profileImage, setProfileImage] = useState<string>("");
-
-  useEffect(() => {
-    if (localStorage.getItem("accessToken")) {
-      const fetchUserDetails = async () => {
-        try {
-          const response = await getUser();
-
-          const userDetails = response.data.responseData;
-
-          setUserData({
-            firstName: userDetails.firstName,
-            lastName: userDetails.lastName,
-            userName: userDetails.userName,
-            email: userDetails.email,
-            isEmailVerified: userDetails.isEmailVerified,
-            phoneNumber: userDetails.phoneNumber,
-            isPhoneNumberVerified: userDetails.isPhoneNumberVerified,
-            profileImage: "",
-          });
-        } catch (error: any) {
-          localStorage.removeItem("accessToken");
-          console.error("Failed to fetch user details:", error);
-        }
-      };
-
-      fetchUserDetails();
-    }
-  }, []);
+  const [favoriteAddress, setFavoriteAddress] = useState<Address>({
+    country: "",
+    city: "",
+    region: "",
+    postalCode: "",
+    address: "",
+    addressAditionally: "",
+  });
 
   return (
     <UserContext.Provider
@@ -105,6 +99,8 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
         setUserData,
         profileImage,
         setProfileImage,
+        favoriteAddress,
+        setFavoriteAddress,
       }}
     >
       {children}

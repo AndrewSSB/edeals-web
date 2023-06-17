@@ -31,7 +31,6 @@ import Payment from "../Payments/Payment";
 import { getUser } from "../../API/user";
 
 interface NavBarProps {
-  isAuthenticated: Boolean;
   isInBasketPage?: Boolean;
   isInFavoritePage?: Boolean;
 }
@@ -50,14 +49,21 @@ export const Navbar = (props: NavBarProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isFavoriteHovered, setIsFavoriteHovered] = useState(false);
   const [isBasketHovered, setIsBasketHovered] = useState(false);
-  const { userData, setUserData } = useContext(UserContext);
+  const { userData, setUserData, setLastName, setFirstName } =
+    useContext(UserContext);
   const [search, setSearch] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const searchChange = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       handleSearch(search);
     }
   };
+
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem("accessToken") ? true : false;
+    setIsAuthenticated(isAuthenticated);
+  }, []);
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -116,6 +122,40 @@ export const Navbar = (props: NavBarProps) => {
   const goToWelcome = () => {
     navigate("/");
   };
+
+  // console.log(isHovered);
+
+  useEffect(() => {
+    if (localStorage.getItem("accessToken")) {
+      const fetchUserDetails = async () => {
+        try {
+          const response = await getUser();
+
+          const userDetails = response.data.responseData;
+
+          setUserData({
+            firstName: userDetails.firstName,
+            lastName: userDetails.lastName,
+            userName: userDetails.userName,
+            email: userDetails.email,
+            isEmailVerified: userDetails.isEmailVerified,
+            phoneNumber: userDetails.phoneNumber,
+            isPhoneNumberVerified: userDetails.isPhoneNumberVerified,
+            profileImage: "",
+            addresses: userDetails.addresses,
+          });
+
+          setFirstName(userDetails.firstName);
+          setLastName(userDetails.lastName);
+        } catch (error: any) {
+          localStorage.removeItem("accessToken");
+          console.error("Failed to fetch user details:", error);
+        }
+      };
+
+      fetchUserDetails();
+    }
+  }, []);
 
   return (
     <NavbarContainer position="sticky" color="default">
@@ -182,7 +222,7 @@ export const Navbar = (props: NavBarProps) => {
               <ArrowDropDownIcon sx={{ color: "black" }} />
             </NoHoverIconButton>
 
-            {isHovered && !props.isAuthenticated && !userData.userName && (
+            {isHovered && !isAuthenticated && (
               <div
                 style={{
                   position: "absolute",
@@ -191,7 +231,7 @@ export const Navbar = (props: NavBarProps) => {
                   left: "auto",
                   width: "300px",
                   backgroundColor: "#F7F7F7",
-                  padding: "20px",
+                  padding: "10px",
                   boxShadow: "0px 2px 4px rgba(100, 111, 203, 0.6)",
                   zIndex: 1,
                 }}
@@ -200,13 +240,12 @@ export const Navbar = (props: NavBarProps) => {
               </div>
             )}
 
-            {isHovered && props.isAuthenticated && userData.userName && (
+            {isHovered && isAuthenticated && userData.userName && (
               <div
                 style={{
                   position: "absolute",
                   top: "100%",
                   right: 0,
-                  left: "auto",
                   width: "200px",
                   backgroundColor: "#F7F7F7",
                   padding: "20px",
@@ -226,7 +265,7 @@ export const Navbar = (props: NavBarProps) => {
                 <AutenticationButtons
                   buttonText="Vezi profilul"
                   buttonWidth="100%"
-                  onClick={() => navigate("/profil")}
+                  onClick={() => navigate("/profile")}
                 />
               </div>
             )}
@@ -286,8 +325,9 @@ export const Navbar = (props: NavBarProps) => {
                   top: "100%",
                   right: 0,
                   left: "auto",
-                  width: "300px",
+                  width: "400px",
                   padding: "20px",
+                  height: "auto",
                   boxShadow: "0px 2px 4px rgba(100, 111, 203, 0.6)",
                   zIndex: 1,
                 }}
@@ -295,7 +335,6 @@ export const Navbar = (props: NavBarProps) => {
                 <div
                   style={{
                     display: "flex",
-                    justifyContent: "center",
                     flexDirection: "column",
                     alignItems: "center",
                   }}
@@ -310,7 +349,7 @@ export const Navbar = (props: NavBarProps) => {
                   <div style={{ margin: "8px 0" }}></div>
                   <AutenticationButtons
                     buttonText="Vezi produsele favorite"
-                    buttonWidth="100%"
+                    buttonWidth="80%"
                     onClick={() => navigate("/favorite")}
                   />
                 </div>
@@ -370,8 +409,9 @@ export const Navbar = (props: NavBarProps) => {
                     top: "100%",
                     right: 0,
                     left: "auto",
-                    width: "300px",
+                    width: "400px",
                     padding: "20px",
+                    height: "auto",
                     boxShadow: "0px 2px 4px rgba(100, 111, 203, 0.6)",
                     zIndex: 1,
                   }}
@@ -379,9 +419,8 @@ export const Navbar = (props: NavBarProps) => {
                   <div
                     style={{
                       display: "flex",
-                      justifyContent: "center",
                       flexDirection: "column",
-                      alignItems: "flex-start",
+                      alignItems: "center",
                     }}
                   >
                     <span style={{ color: "#2f366f", marginBottom: "10px" }}>

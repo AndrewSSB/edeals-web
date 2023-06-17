@@ -21,6 +21,8 @@ import "./ProductProfile.css";
 import { useContext, useEffect, useState } from "react";
 import { AutenticationButtons } from "../CustomButtons/CustomButtons";
 import { UserContext } from "../../context/UserContext";
+import { useNavigate } from "react-router-dom";
+import Checkout from "../Checkout/Checkout";
 
 interface ProductProfileProps {
   basket?: string;
@@ -251,7 +253,7 @@ const typografyStyle = (props: typografyStyleProps) => {
   };
 };
 
-const lineStyle = {
+export const lineStyle = {
   borderBottom: "1px solid #ccc",
   margin: "10px 20px",
 };
@@ -266,6 +268,8 @@ export const ProductProfile = (props: ProductProfileProps) => {
   const { userData } = useContext(UserContext);
 
   const allProducts = manageProducts(products, shoppingSession);
+
+  const navigator = useNavigate();
 
   useEffect(() => {
     setTransportPrice(
@@ -297,7 +301,6 @@ export const ProductProfile = (props: ProductProfileProps) => {
       }}
     >
       <Navbar
-        isAuthenticated={isAuthenticated}
         isInBasketPage={props.isInFavoritePage}
         isInFavoritePage={props.isInbasketPage}
       />
@@ -364,7 +367,10 @@ export const ProductProfile = (props: ProductProfileProps) => {
                 </Avatar>
               )}
             </div>
-            <div style={{ height: "25px" }}>
+            <div
+              style={{ height: "25px" }}
+              onClick={() => navigator("/profile")}
+            >
               <Typography
                 variant="h6"
                 style={typografyStyle({
@@ -441,27 +447,31 @@ export const ProductProfile = (props: ProductProfileProps) => {
 
         <Box sx={{ width: "1000px" }}>
           {!props.isInbasketPage
-            ? allProducts?.map((product) => (
-                <ProductCard
-                  image={
-                    product?.product ? product?.product.images.mainImage : ""
-                  }
-                  description={
-                    product?.product ? product.product.description : ""
-                  }
-                  quantity={product.quantity}
-                  price={product?.product ? product.product.price : 0}
-                  isInBasket={true}
-                />
+            ? allProducts?.map((product, idx) => (
+                <div key={idx}>
+                  <ProductCard
+                    image={
+                      product?.product ? product?.product.images.mainImage : ""
+                    }
+                    description={
+                      product?.product ? product.product.description : ""
+                    }
+                    quantity={product.quantity}
+                    price={product?.product ? product.product.price : 0}
+                    isInBasket={true}
+                  />
+                </div>
               ))
-            : favorites?.map((product) => (
-                <ProductCard
-                  image={product ? product?.images.mainImage : ""}
-                  description={product ? product?.description : ""}
-                  quantity={1}
-                  price={product ? product.price : 0}
-                  isInBasket={false}
-                />
+            : favorites?.map((product, idx) => (
+                <div key={idx}>
+                  <ProductCard
+                    image={product ? product?.images.mainImage : ""}
+                    description={product ? product?.description : ""}
+                    quantity={1}
+                    price={product ? product.price : 0}
+                    isInBasket={false}
+                  />
+                </div>
               ))}
         </Box>
 
@@ -553,6 +563,7 @@ export const ProductProfile = (props: ProductProfileProps) => {
               <AutenticationButtons
                 buttonText={"Continuă"}
                 buttonWidth={"94%"}
+                onClick={() => navigator("/checkout")}
               />
             </div>
           </Box>

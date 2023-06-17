@@ -1,4 +1,3 @@
-import React, { useContext, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import { Routes } from "react-router-dom";
@@ -9,15 +8,13 @@ import SignUp from "./components/Authentication/SignUp/SignUp";
 import { NotFoundPage } from "./components/NotFound/NotFound";
 import { ProductContextProvider } from "./context/ProductsContext";
 import Payment from "./components/Payments/Payment";
-import { SendbirdChat } from "./components/Chat/SendbirdChat";
-import { Test } from "./components/Chat/Test";
-import { AgoraChat } from "./components/Chat/AgoraChat";
-import SendbirdProvider from "@sendbird/uikit-react/SendbirdProvider";
 import { Favorites } from "./components/Basket/Favorites";
 import { Basket } from "./components/Basket/Basket";
-import { Provider } from "react-redux";
 import { ChatComponent } from "./components/Chat/SignalR";
 import { ProductDetails } from "./components/ProductDetails/ProductDetails";
+import { UserProfile } from "./components/UserProfile/UserProfile";
+import { AddressForm } from "./components/Checkout/AddressForm";
+import Checkout from "./components/Checkout/Checkout";
 
 const App = () => {
   return (
@@ -31,11 +28,13 @@ const App = () => {
               <Route path="/signup" element={<SignUp />} />
               <Route path="/basket" element={<Basket />} />
               <Route path="/favorite" element={<Favorites />} />
-              <Route path="/payment" element={<Payment />} />
+              <Route path="/payment/:shopingSessionId" element={<Payment />} />
+              <Route path="/product/:productId" element={<ProductDetails />} />
+              <Route path="/profile" element={<UserProfile />} />
+              <Route path="/checkout" element={<Checkout />} />
               {/* <Route path="/test" element={<Test />} /> */}
               {/* <Route path="/agora" element={<AgoraChat />} /> */}
-              <Route path="/chat" element={<ChatComponent />} />
-              <Route path="/product" element={<ProductDetails />} />
+              {/* <Route path="/chat" element={<ChatComponent />} /> */}
               {/* <Route
                 path="/chat"
                 element={
