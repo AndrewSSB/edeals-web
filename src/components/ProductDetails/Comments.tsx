@@ -61,7 +61,7 @@ export const Comments = (props: CommentsProps) => {
           onClick={props?.onClick}
           style={{ cursor: "pointer", height: "15px", width: "10px" }}
         >
-          Ene
+          Mihai
         </span>
         <span
           style={{
@@ -71,14 +71,10 @@ export const Comments = (props: CommentsProps) => {
             color: "#6b6b6b",
           }}
         >
-          20 mai 2018
+          06 iunie 2023
         </span>
         <span style={{ wordBreak: "break-word", margin: "20px 50px 0 0px" }}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam id
-          massa eu ex lobortis egestas sed in sem. Integer nec egestas tortor.
-          Interdum et malesuada fames ac ante ipsum primis in faucibus.
-          Suspendisse ultricies nibh lacus, sit amet cursus eros mollis a.
-          Quisque vel scelerisque sapien.
+          Cum se descurcă în editarea video acest sistem all in one ?
         </span>
       </div>
     </div>

@@ -62,7 +62,7 @@ export const Reviews = (props: ReviewsProps) => {
           onClick={props?.onClick}
           style={{ cursor: "pointer", height: "15px", width: "15px" }}
         >
-          Ene
+          Bogdan
         </span>
         <span
           style={{
@@ -76,26 +76,17 @@ export const Reviews = (props: ReviewsProps) => {
         </span>
         <Rating
           name="product-rating"
-          value={Math.random() * (5 - 1) + 1}
+          value={5}
           precision={0.5}
           readOnly
           style={{ fontSize: "16px", marginTop: "10px", marginLeft: "-2px" }}
         />
         <span style={{ wordBreak: "break-word", margin: "20px 50px 0 0px" }}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam id
-          massa eu ex lobortis egestas sed in sem. Integer nec egestas tortor.
-          Interdum et malesuada fames ac ante ipsum primis in faucibus.
-          Suspendisse ultricies nibh lacus, sit amet cursus eros mollis a.
-          Quisque vel scelerisque sapien. Lorem ipsum dolor sit amet,
-          consectetur adipiscing elit. Aliquam id massa eu ex lobortis egestas
-          sed in sem. Integer nec egestas tortor. Interdum et malesuada fames ac
-          ante ipsum primis in faucibus. Suspendisse ultricies nibh lacus, sit
-          amet cursus eros mollis a. Quisque vel scelerisque sapien. Lorem ipsum
-          dolor sit amet, consectetur adipiscing elit. Aliquam id massa eu ex
-          lobortis egestas sed in sem. Integer nec egestas tortor. Interdum et
-          malesuada fames ac ante ipsum primis in faucibus. Suspendisse
-          ultricies nibh lacus, sit amet cursus eros mollis a. Quisque vel
-          scelerisque sapien.
+          Am achiziționat acest produs și sunt extrem de mulțumit de performanța
+          sa! Timpul de răspuns rapid îmi permite să fiu mereu în control și să
+          mă bucur de acțiunea fără întârzieri. Rezoluția înaltă și ecranul
+          generos mă absorb complet în lumea virtuală, oferindu-mi o experiență
+          captivantă.
         </span>
       </div>
     </div>

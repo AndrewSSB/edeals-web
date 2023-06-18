@@ -58,11 +58,10 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
-    <Grid item xs={6} sm={6} md={2} lg={2}>
+    <Grid item xs={2} sm={2} md={3} lg={2}>
       <Card
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        onClick={() => handleProductDetails(product.productId)}
         style={{
           border: "none",
           boxShadow: isHovered
@@ -71,7 +70,10 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           height: "100%",
         }}
       >
-        <CardWrapper style={{ cursor: "pointer" }}>
+        <CardWrapper
+          style={{ cursor: "pointer" }}
+          onClick={() => handleProductDetails(product.productId)}
+        >
           <CardImage>
             <img src={product.images.mainImage} alt={product.name} />
           </CardImage>
@@ -80,7 +82,6 @@ export const ProductCard = ({ product }: ProductCardProps) => {
               marginTop: "15px",
               maxHeight: "20px",
               paddingLeft: "0",
-              minHeight: "40px",
               cursor: "pointer",
             }}
           >
@@ -99,12 +100,14 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             />
           </CardContent>
         </CardWrapper>
+        <div style={{ border: "1px solid #e0e0e0", width: "auto" }} />
         <div
           style={{
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
+            height: "60px",
             padding: "0 10px",
           }}
         >

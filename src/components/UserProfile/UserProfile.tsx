@@ -1,9 +1,21 @@
-import { CSSProperties, ReactNode, useContext } from "react";
+import { CSSProperties, ReactNode, useContext, useState } from "react";
 import { Navbar } from "../Navbar/Navbar";
 import { UserContext } from "../../context/UserContext";
-import { Avatar, Box, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  Typography,
+  keyframes,
+  styled,
+} from "@mui/material";
 import EditTwoToneIcon from "@mui/icons-material/EditTwoTone";
 import VerifiedTwoToneIcon from "@mui/icons-material/VerifiedTwoTone";
+import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
+import { NoHoverIconButton } from "../Navbar/NavbarElements";
+import MessageOutlinedIcon from "@mui/icons-material/MessageOutlined";
+import OpenInNewOutlinedIcon from "@mui/icons-material/OpenInNewOutlined";
+import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
 
 interface ProfileDataProps {
   tag: string;
@@ -16,6 +28,8 @@ interface ProfileDataProps {
 interface ProfileCardProps {
   title: string;
   children: ReactNode;
+  expandButtonContent?: string;
+  style?: CSSProperties;
 }
 
 const ProfileData = (props: ProfileDataProps) => {
@@ -33,18 +47,30 @@ const ProfileData = (props: ProfileDataProps) => {
         <Typography variant="h6" style={{ color: "#6b6b6b" }}>
           {props.tag}
         </Typography>
-        <Typography
+        <div
           style={{
-            fontStyle: "italic",
-            fontSize: "16px",
+            display: "flex",
+            justifyContent: "center",
+            height: "30px",
+            alignItems: "center",
           }}
         >
-          {props.text}
-        </Typography>
-        {props.isVerified && (
-          <VerifiedTwoToneIcon style={{ color: "#646FCB" }} />
-        )}
-        <EditTwoToneIcon style={{ color: "#646FCB" }} />
+          <Typography
+            style={{
+              fontStyle: "italic",
+              fontSize: "16px",
+              marginRight: "30px",
+            }}
+          >
+            {props.text}
+          </Typography>
+          <div style={{ width: "40px", marginRight: "10px" }}>
+            {props.isVerified && (
+              <VerifiedTwoToneIcon style={{ color: "#646FCB" }} />
+            )}
+          </div>
+          <EditTwoToneIcon style={{ color: "#646FCB" }} />
+        </div>
       </div>
       {!props.disableLine && (
         <div
@@ -61,7 +87,30 @@ const ProfileData = (props: ProfileDataProps) => {
 
 const test = [1, 2, 3, 4, 5, 6, 7, 8, 10];
 
+const bounceAnimation = keyframes`
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+`;
+
+const BouncingIcon = styled("span")`
+  display: inline-block;
+  animation: ${bounceAnimation} 1.5s infinite;
+`;
+
 const ProfileCard = (props: ProfileCardProps) => {
+  const [expanded, setExpanded] = useState(false);
+
+  const toggleExpansion = () => {
+    setExpanded(!expanded);
+  };
+
   return (
     <Box
       style={{
@@ -70,8 +119,10 @@ const ProfileCard = (props: ProfileCardProps) => {
         borderRadius: "5px",
         width: "auto",
         maxWidth: "400px",
-        height: "fit-content",
+        height: expanded ? "fit-content" : "300px",
+        overflow: "hidden",
         boxShadow: "0px 0px 10px rgba(100, 111, 203, 0.6)",
+        ...props.style,
       }}
     >
       <Typography
@@ -84,7 +135,34 @@ const ProfileCard = (props: ProfileCardProps) => {
       >
         {props.title}
       </Typography>
-      {props.children}
+      <Box
+        style={{
+          height: expanded ? "auto" : "calc(100% - 48px)",
+          overflow: "hidden",
+        }}
+      >
+        {props.children}
+      </Box>
+      {!expanded && (
+        <NoHoverIconButton
+          onClick={toggleExpansion}
+          style={{
+            marginTop: "20px",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <BouncingIcon
+            style={{
+              color: "#646FCB",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <KeyboardDoubleArrowDownIcon />
+          </BouncingIcon>
+        </NoHoverIconButton>
+      )}
     </Box>
   );
 };
@@ -108,7 +186,7 @@ export const UserProfile = () => {
             backgroundColor: "white",
             borderRadius: "5px",
             width: "480px",
-            height: "470px",
+            height: "480px",
             maxWidth: "520px",
             maxHeight: "540px",
             boxShadow: "0px 0px 10px rgba(100, 111, 203, 0.6)",
@@ -122,7 +200,7 @@ export const UserProfile = () => {
               paddingTop: "10px",
             }}
           >
-            Contul tău
+            Contul meu
           </Typography>
           <div
             style={{
@@ -156,48 +234,205 @@ export const UserProfile = () => {
           <ProfileData tag="First name" text={userData.firstName} />
           <ProfileData tag="Last name" text={userData.lastName} />
           <ProfileData tag="Username" text={userData.firstName} />
-          <ProfileData
-            tag="Email"
-            text={userData.email}
-            isVerified={userData.isEmailVerified}
-          />
+          <ProfileData tag="Email" text={"test@gmail.com"} isVerified={true} />
           <ProfileData
             tag="Phone number"
-            text={userData.phoneNumber}
-            isVerified={userData.isPhoneNumberVerified}
+            text={"+40741385734"}
+            isVerified={true}
           />
         </Box>
 
-        <ProfileCard title="Reduceri Personale">
-          {test.map((item, idx) => {
-            return (
-              <div key={idx} style={{ marginTop: "20px" }}>
-                Phasellus rhoncus arcu neque.
-              </div>
-            );
-          })}
+        <ProfileCard
+          title="Reduceri Personale"
+          style={{
+            height: "430px",
+            width: "300px",
+            display: "flex",
+            alignItems: "center",
+            flexDirection: "column",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              width: "400px",
+              height: "40px",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-evenly",
+              margin: "30px 20px 0px 20px",
+            }}
+          >
+            <Typography
+              variant="h6"
+              style={{
+                fontSize: "16px",
+              }}
+            >
+              HQTESA
+            </Typography>
+            <Typography
+              variant="h6"
+              style={{
+                fontSize: "14px",
+                fontStyle: "italic",
+              }}
+            >
+              20% orice produs
+            </Typography>
+            <NoHoverIconButton>
+              <ContentCopyOutlinedIcon style={{ color: "#646FCB" }} />
+            </NoHoverIconButton>
+          </div>
         </ProfileCard>
-        <ProfileCard title="Adresele mele">
-          {test.map((item, idx) => {
-            return (
-              <div key={idx} style={{ marginTop: "20px" }}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Phasellus rhoncus arcu neque,
-              </div>
-            );
-          })}
+        <ProfileCard
+          title="Adresele mele"
+          style={{
+            height: "430px",
+            width: "340px",
+            display: "flex",
+            alignItems: "center",
+            flexDirection: "column",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              width: "400px",
+              height: "40px",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-around",
+              margin: "30px 20px 0px 20px",
+            }}
+          >
+            <Typography
+              variant="h6"
+              style={{
+                fontSize: "16px",
+              }}
+            >
+              Strada Academiei 14, București 010014
+            </Typography>
+            <NoHoverIconButton>
+              <ContentCopyOutlinedIcon style={{ color: "#646FCB" }} />
+            </NoHoverIconButton>
+          </div>
         </ProfileCard>
       </div>
       <div
-        style={{ display: "flex", justifyContent: "center", marginTop: "50px" }}
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-evenly",
+          alignItems: "center",
+          marginTop: "50px",
+        }}
       >
-        <ProfileCard title={""}>
-          <div>sal</div>
+        <ProfileCard
+          title="Comenzile mele"
+          style={{
+            height: "430px",
+            width: "600px",
+            display: "flex",
+            alignItems: "center",
+            flexDirection: "column",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              width: "400px",
+              height: "40px",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-around",
+              margin: "30px 20px 0px 20px",
+            }}
+          >
+            <Typography
+              variant="h6"
+              style={{
+                fontSize: "16px",
+              }}
+            >
+              Strada Academiei 14, București 010014
+            </Typography>
+            <NoHoverIconButton>
+              <OpenInNewOutlinedIcon style={{ color: "#646FCB" }} />
+            </NoHoverIconButton>
+          </div>
         </ProfileCard>
-        <ProfileCard title={""}>
-          <div>sal</div>
+        <ProfileCard
+          title={"Conversațiie mele"}
+          style={{
+            height: "430px",
+            width: "600px",
+            display: "flex",
+            alignItems: "center",
+            flexDirection: "column",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              width: "400px",
+              height: "40px",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-around",
+              margin: "30px 20px 0px 20px",
+            }}
+          >
+            <Typography
+              variant="h6"
+              style={{
+                fontSize: "16px",
+              }}
+            >
+              Bogdan
+            </Typography>
+            <NoHoverIconButton>
+              <MessageOutlinedIcon style={{ color: "#646FCB" }} />
+            </NoHoverIconButton>
+          </div>
+        </ProfileCard>
+        <ProfileCard
+          title={"Review-urile mele"}
+          style={{
+            height: "430px",
+            width: "600px",
+            display: "flex",
+            alignItems: "center",
+            flexDirection: "column",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              width: "400px",
+              height: "40px",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-around",
+              margin: "30px 20px 0px 20px",
+            }}
+          >
+            <Typography
+              variant="h6"
+              style={{
+                fontSize: "16px",
+              }}
+            >
+              Sistem all in one
+            </Typography>
+            <NoHoverIconButton>
+              <OpenInNewOutlinedIcon style={{ color: "#646FCB" }} />
+            </NoHoverIconButton>
+          </div>
         </ProfileCard>
       </div>
+      <div style={{ marginBottom: "20px" }} />
     </div>
   );
 };

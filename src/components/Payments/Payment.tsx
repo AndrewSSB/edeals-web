@@ -20,6 +20,7 @@ export default function Payment() {
 
     const createPayment = async () => {
       try {
+        console.log(shopingSessionId);
         if (shopingSessionId) {
           const response = await createPaymentIntent(
             shopingSessionId as unknown as number

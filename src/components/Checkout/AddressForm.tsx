@@ -30,7 +30,7 @@ export const AddressForm = (props: AddressFormProps) => {
         justifyContent={"center"}
         marginBottom={"20px"}
       >
-        Adresa de livrare
+        Introdu adresa de livrare
       </Typography>
       <Grid container spacing={1} component={NoShadowPaper}>
         <Grid item xs={12} sm={6}>

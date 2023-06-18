@@ -94,6 +94,10 @@ export const ProductDetails = (props: ProductDetailsProps) => {
     setProduct(produs);
   }, []);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const test = [1, 2, 3, 4, 5];
 
   return (
@@ -266,6 +270,7 @@ export const ProductDetails = (props: ProductDetailsProps) => {
               <Rating
                 name="product-rating"
                 precision={0.5}
+                value={5}
                 style={{
                   fontSize: "36px",
                   marginTop: "10px",
@@ -311,7 +316,7 @@ export const ProductDetails = (props: ProductDetailsProps) => {
             return (
               <div key={idx}>
                 <div className="gray-line" />
-                <Reviews onClick={() => handleSelectedUser("Ene")} />
+                <Reviews onClick={() => handleSelectedUser("Bogdan")} />
               </div>
             );
           })}
@@ -339,7 +344,7 @@ export const ProductDetails = (props: ProductDetailsProps) => {
             return (
               <div key={idx}>
                 <div className="gray-line" />
-                <Comments onClick={() => handleSelectedUser("Ene")} />
+                <Comments onClick={() => handleSelectedUser("Mihai")} />
               </div>
             );
           })}

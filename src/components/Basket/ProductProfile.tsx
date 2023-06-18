@@ -90,7 +90,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           sx={{
             marginLeft: "15px",
             width: 200,
-            height: 200,
+            height: 240,
             marginRight: 2,
             objectFit: "contain",
           }}
@@ -106,7 +106,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         >
           <ProductDescription
             variant="body1"
-            style={{ margin: "0px 10px 0 10px" }}
+            style={{ margin: "15px 10px 0 10px" }}
           >
             {description}
           </ProductDescription>

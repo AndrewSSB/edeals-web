@@ -31,7 +31,6 @@ export default function Checkout() {
   const [address, setAddress] = useState<Address>({});
 
   const getStepContent = (step: number, shopping: ShoppingSession) => {
-    console.log(firstName, lastName);
     switch (step) {
       case 0:
         return (
@@ -67,12 +66,14 @@ export default function Checkout() {
   };
 
   const handleBack = () => {
+    if (activeStep <= 0) {
+      navigate("/basket");
+    }
     setActiveStep(activeStep - 1);
   };
 
   const handleProductDetails = () => {
-    // console.log(shoppingSession.cartItems[0].shoppingSessionId);
-    // navigate(`/payment/${shoppingSession.cartItems[0].shoppingSessionId}`);
+    navigate(`/payment/${shoppingSession.cartItems[0].shoppingSessionId}`);
   };
 
   return (
@@ -126,18 +127,16 @@ export default function Checkout() {
                       justifyContent: "flex-start",
                     }}
                   >
-                    {activeStep !== 0 && (
-                      <AutenticationButtons
-                        buttonText={"Întoarce-te"}
-                        buttonWidth="160px"
-                        type="submit"
-                        style={{
-                          margin: "20px 0px 20px 20px",
-                          fontSize: "16px",
-                        }}
-                        onClick={handleBack}
-                      />
-                    )}
+                    <AutenticationButtons
+                      buttonText={"Întoarce-te"}
+                      buttonWidth="160px"
+                      type="submit"
+                      style={{
+                        margin: "20px 0px 20px 20px",
+                        fontSize: "16px",
+                      }}
+                      onClick={handleBack}
+                    />
                   </Box>
                   <Box
                     style={{

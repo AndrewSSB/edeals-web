@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  api:
+    container_name: edeal_web
+    image: edeal_web
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+      args:
+        - NODE_ENV=production
+    environment:
+      - NODE_ENV=production
+      - DEPLOY_ENV=dev
+      - PORT=5003
+    restart: unless-stopped
+    command: sh -cx "npm install && npm start"
+    volumes:
+      - .:/usr/src/app/
+      - /usr/src/app/node_modules
+      - /usr/src/app/dist
+    ports:
+      - "5003:5003"

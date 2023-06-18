@@ -15,6 +15,30 @@ interface ReviewProps {
   lastName: string | null;
 }
 
+export const DisplayAddress = (props: ReviewProps) => {
+  let niceAddress = props.address.address ?? "";
+
+  if (
+    props.address.addressAditionally !== "" &&
+    props.address.addressAditionally
+  ) {
+    niceAddress = niceAddress + ", " + props.address.addressAditionally;
+  }
+  if (props.address?.country !== "" && props.address.addressAditionally) {
+    niceAddress = niceAddress + ", " + props.address.country;
+  }
+  if (props.address?.region !== "" && props.address.addressAditionally) {
+    niceAddress = niceAddress + ", " + props.address.region;
+  }
+  if (props.address?.city !== "" && props.address.addressAditionally) {
+    niceAddress = niceAddress + ", " + props.address.city;
+  }
+  if (props.address?.postalCode !== "" && props.address.addressAditionally) {
+    niceAddress = niceAddress + ", " + props.address.postalCode;
+  }
+  return <Typography gutterBottom>{niceAddress}</Typography>;
+};
+
 export const Review = (props: ReviewProps) => {
   return (
     <React.Fragment>
@@ -44,8 +68,9 @@ export const Review = (props: ReviewProps) => {
               secondary={"x" + product.quantity}
             />
             <Typography
-              width={"120px"}
+              width={"180px"}
               display={"flex"}
+              marginLeft={"30px"}
               justifyContent={"flex-end"}
               variant="body2"
             >
@@ -55,18 +80,15 @@ export const Review = (props: ReviewProps) => {
         ))}
         <div style={{ margin: "10px 0px 10px 0px" }} className="gray-line" />
         <ListItem sx={{ py: 1, px: 0 }}>
-          <ListItemText style={{ marginLeft: "10px" }} primary="Total" />
+          <ListItemText style={{ marginLeft: "10px" }} primary="Transport" />
           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-            {props.shoppingSession.total} lei
+            36.67 lei
           </Typography>
         </ListItem>
         <ListItem sx={{ py: 0, px: 0 }}>
-          <ListItemText
-            style={{ marginLeft: "10px" }}
-            primary="Total cu reducere"
-          />
+          <ListItemText style={{ marginLeft: "10px" }} primary="Total" />
           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-            {props.shoppingSession.total} lei
+            3186.66 lei
           </Typography>
         </ListItem>
       </List>
@@ -79,12 +101,12 @@ export const Review = (props: ReviewProps) => {
           <Typography gutterBottom>
             {props.firstName} {props.lastName}
           </Typography>
-          <Typography gutterBottom>
-            {props.address.address}, {props.address.addressAditionally},{" "}
-            {props.address.country}, {props.address.region},{" "}
-            {props.address.city}, {props.address.postalCode}
-          </Typography>
-          <Typography gutterBottom>{props.address.mentiuni}</Typography>
+          <DisplayAddress
+            shoppingSession={props.shoppingSession}
+            address={props.address}
+            firstName={null}
+            lastName={null}
+          />
         </Grid>
       </Grid>
     </React.Fragment>
