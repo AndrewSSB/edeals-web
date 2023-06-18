@@ -23,22 +23,22 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup Node App
+        uses: actions/setup-node@v2
+        with:
+          node-version: "latest"
+      - name: Build Docker Image
         run: |
-          npm install
-          npm run build
-      # - name: Build Docker Image
-      #   run: |
-      #     docker build -t ${{ env.APP_NAME }}:${{env.VERSION_NUMBER}} .
-      #     docker save -o ${{ env.APP_NAME }}.tar ${{ env.APP_NAME }}:${{env.VERSION_NUMBER}}
-      - name: Transfer the build artifacts
+          docker build -t ${{ env.APP_NAME }}:${{env.VERSION_NUMBER}} .
+          docker save -o ${{ env.APP_NAME }}.tar ${{ env.APP_NAME }}:${{env.VERSION_NUMBER}}
+      - name: Transfer the Docker Image
         uses: appleboy/scp-action@master
         with:
           host: ${{env.SSH_IP}}
           port: 22
           username: ${{env.SSH_USER}}
           key: ${{env.SSK_KEY}}
-          source: "build"
-          target: "/home/${{env.SSH_USER}}/${{ env.APP_NAME }}"
+          source: "${{ env.APP_NAME }}.tar"
+          target: "/home/${{env.SSH_USER}}"
 
   run-container:
     runs-on: ubuntu-latest
@@ -52,6 +52,7 @@ jobs:
           key: ${{env.SSK_KEY}}
           script: |
             echo "${{ env.DOCKER_ENV_FILE }}" > ./docker.env
-            docker stop ${{ env.APP_NAME }} || true
-            docker rm ${{ env.APP_NAME }} || true
-            docker run -d -p ${{env.OUT_PORT}}:${{env.IN_PORT}} --network edeals --name ${{ env.APP_NAME }} --env-file ./docker.env -v /home/${{ env.SSH_USER }}/${{ env.APP_NAME }}:/usr/share/nginx/html:ro nginx:latest
+            docker image prune -a -f
+            docker load -i ${{ env.APP_NAME }}.tar
+            docker rm -f ${{env.APP_NAME}}
+            docker run -d -p ${{env.OUT_PORT}}:${{env.IN_PORT}} --network edeals --name ${{env.APP_NAME}} --env-file ./docker.env ${{env.APP_NAME}}:${{env.VERSION_NUMBER}}
