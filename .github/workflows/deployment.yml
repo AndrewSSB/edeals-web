@@ -8,7 +8,7 @@ on:
 
 env:
   APP_NAME: edeals_web
-  IN_PORT: 5003
+  IN_PORT: 3000
   OUT_PORT: 5003
   ENVIRONMENT: Production
   SSH_KEY: ${{ secrets.prod_ssh_key }}
