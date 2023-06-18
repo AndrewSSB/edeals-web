@@ -13,7 +13,7 @@ services:
       - DEPLOY_ENV=dev
       - PORT=5003
     restart: unless-stopped
-    command: sh -cx "npm install && npm start"
+    command: sh -cx "npm install && npm run prod"
     volumes:
       - .:/usr/src/app/
       - /usr/src/app/node_modules
