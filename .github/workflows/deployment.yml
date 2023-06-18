@@ -37,20 +37,20 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        
+
       - name: Build Docker Image
-          run: |
-            docker build -t ${{ env.APP_NAME }}:${{env.VERSION_NUMBER}} .
-            docker save -o ${{ env.APP_NAME }}.tar ${{ env.APP_NAME }}:${{env.VERSION_NUMBER}}
-        - name: Transfer the Docker Image
-          uses: appleboy/scp-action@master
-          with:
-            host: ${{env.SSH_IP}}
-            port: 22
-            username: ${{env.SSH_USER}}
-            key: ${{env.SSK_KEY}}
-            source: "${{ env.APP_NAME }}.tar"
-            target: "/home/${{env.SSH_USER}}"
+        run: |
+          docker build -t ${{ env.APP_NAME }}:${{env.VERSION_NUMBER}} .
+          docker save -o ${{ env.APP_NAME }}.tar ${{ env.APP_NAME }}:${{env.VERSION_NUMBER}}
+      - name: Transfer the Docker Image
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{env.SSH_IP}}
+          port: 22
+          username: ${{env.SSH_USER}}
+          key: ${{env.SSK_KEY}}
+          source: "${{ env.APP_NAME }}.tar"
+          target: "/home/${{env.SSH_USER}}"
 
   run-container:
     runs-on: ubuntu-latest
