@@ -18,7 +18,7 @@ env:
   DOCKER_ENV_FILE: ${{ secrets.prod_docker_env_file }}
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     strategy:
