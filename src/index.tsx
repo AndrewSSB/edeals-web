@@ -15,27 +15,26 @@ import { ProductDetails } from "./components/ProductDetails/ProductDetails";
 import { UserProfile } from "./components/UserProfile/UserProfile";
 import { AddressForm } from "./components/Checkout/AddressForm";
 import Checkout from "./components/Checkout/Checkout";
+import { useContext, useEffect } from "react";
 
 const App = () => {
   return (
-    <UserContext.Consumer>
-      {(userContext) => (
-        <ProductContextProvider>
-          <Router>
-            <Routes>
-              <Route path="/" element={<WelcomePage />} />
-              <Route path="/signin" element={<SignIn />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/basket" element={<Basket />} />
-              <Route path="/favorite" element={<Favorites />} />
-              <Route path="/payment/:shopingSessionId" element={<Payment />} />
-              <Route path="/product/:productId" element={<ProductDetails />} />
-              <Route path="/profile" element={<UserProfile />} />
-              <Route path="/checkout" element={<Checkout />} />
-              {/* <Route path="/test" element={<Test />} /> */}
-              {/* <Route path="/agora" element={<AgoraChat />} /> */}
-              {/* <Route path="/chat" element={<ChatComponent />} /> */}
-              {/* <Route
+    <ProductContextProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<WelcomePage />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/basket" element={<Basket />} />
+          <Route path="/favorite" element={<Favorites />} />
+          <Route path="/payment/:shopingSessionId" element={<Payment />} />
+          <Route path="/product/:productId" element={<ProductDetails />} />
+          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/checkout" element={<Checkout />} />
+          {/* <Route path="/test" element={<Test />} /> */}
+          {/* <Route path="/agora" element={<AgoraChat />} /> */}
+          {/* <Route path="/chat" element={<ChatComponent />} /> */}
+          {/* <Route
                 path="/chat"
                 element={
                   <SendbirdChat
@@ -45,12 +44,10 @@ const App = () => {
                   />
                 }
               /> */}
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </Router>
-        </ProductContextProvider>
-      )}
-    </UserContext.Consumer>
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </Router>
+    </ProductContextProvider>
   );
 };
 

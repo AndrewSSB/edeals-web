@@ -1,9 +1,35 @@
 import React, { createContext, useEffect, useState } from "react";
-import { getFavorites, getProducts, getShoppingSession } from "../API/products";
+import {
+  getCategories,
+  getFavorites,
+  getProducts,
+  getShoppingSession,
+} from "../API/products";
+import { GetProductsFromLocalStorage } from "../hooks/SetItemsToLocalStorage";
 
 type ProductContextProps = {
   children: React.ReactNode;
 };
+
+interface Review {
+  firstName: string;
+  lastName: string;
+  comment: string;
+  createdAt: string;
+  email: string;
+  username: string;
+  rating: number;
+  title: string;
+  hasBoughtProduct: boolean;
+}
+
+interface Comment {
+  firstName: string;
+  lastName: string;
+  comment: string;
+  createdAt: string;
+  username: string;
+}
 
 export interface Product {
   productId: string;
@@ -39,6 +65,8 @@ export interface Product {
     description: string;
     discountPercent: number;
   }[];
+  reviews: Review[];
+  comments: Comment[];
 }
 
 export interface CartItem {
@@ -58,6 +86,15 @@ export interface ShoppingSession {
   cartItems: CartItem[];
 }
 
+export interface Category {
+  categoryId: number;
+  categoryName: string;
+  description: string;
+  parentCategoryId: number | null;
+  parentCategory: Category | null;
+  subCategories: Category[] | null;
+}
+
 type ProductContextType = {
   products: Product[];
   setProducts: (value: Product[]) => void;
@@ -71,6 +108,8 @@ type ProductContextType = {
   setFavorites: (value: Product[]) => void;
   shoppingSession: ShoppingSession;
   setShoppingSession: (value: ShoppingSession) => void;
+  categories: Category[];
+  setCategories: (value: Category[]) => void;
 };
 
 export const ProductContext = createContext<ProductContextType>(
@@ -88,6 +127,7 @@ export const ProductContextProvider = ({ children }: ProductContextProps) => {
     cartItems: [],
     total: 0,
   });
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -103,6 +143,63 @@ export const ProductContextProvider = ({ children }: ProductContextProps) => {
         setPageSize(responseData.pageSize);
         setTotalPageNumber(responseData.totalPageNumber);
         setCurrentPageNumber(responseData.currentPageNumber);
+
+        if (!localStorage.getItem("accessToken")) {
+          const favoritesFromLocalStorage = GetProductsFromLocalStorage({
+            keyName: "favorite",
+          });
+
+          const filteredProducts = responseData.data.filter(
+            (product: { productId: string }) => {
+              if (favoritesFromLocalStorage) {
+                return favoritesFromLocalStorage.find(
+                  (prd) => prd.productId === product.productId
+                );
+              }
+              return false;
+            }
+          );
+
+          setFavorites(filteredProducts);
+        }
+
+        if (!localStorage.getItem("accessToken")) {
+          const cartItemsFromLocalStorage = GetProductsFromLocalStorage({
+            keyName: "cartItems",
+          });
+
+          const productsFromLocal: Product[] = responseData.data.filter(
+            (product: { productId: string }) => {
+              if (cartItemsFromLocalStorage) {
+                return cartItemsFromLocalStorage.find(
+                  (prd) => prd.productId === product.productId
+                );
+              }
+              return false;
+            }
+          );
+
+          shoppingSession.cartItems = productsFromLocal.map((prod, idx) => {
+            return {
+              cartItemId: idx,
+              productId: prod.productId,
+              productName: prod.name,
+              quantity: 0,
+              shoppingSessionId: 0,
+              image: prod.images.mainImage,
+              productPrice: prod.price.toString(),
+              description: prod.shortDescription,
+            };
+          });
+
+          shoppingSession.total = +shoppingSession.cartItems
+            .reduce((accumulator, item) => {
+              return accumulator + +item.productPrice * item.quantity;
+            }, 0)
+            .toFixed(2);
+
+          setShoppingSession(shoppingSession);
+        }
       } catch (error: any) {
         console.log("Failed to fetch products:", error);
       }
@@ -112,34 +209,19 @@ export const ProductContextProvider = ({ children }: ProductContextProps) => {
   }, []);
 
   useEffect(() => {
-    const fetchFavorites = async () => {
+    const fetchCategories = async () => {
       try {
-        const response = await getFavorites();
+        const response = await getCategories();
 
-        const responseData = response.data.responseData;
+        const categories = response.data.responseData;
 
-        setFavorites(responseData);
-      } catch (error: any) {
-        console.error("Failed to fetch favorite products:", error);
+        setCategories(categories);
+      } catch {
+        console.error("n-a mers categories");
       }
     };
 
-    fetchFavorites();
-  }, []);
-
-  useEffect(() => {
-    const fetchCartItems = async () => {
-      try {
-        const response = await getShoppingSession(1);
-
-        const responseData = response.data.responseData;
-        setShoppingSession(responseData);
-      } catch (error: any) {
-        console.error("Failed to fetch shopping session:", error);
-      }
-    };
-
-    fetchCartItems();
+    fetchCategories();
   }, []);
 
   return (
@@ -157,6 +239,8 @@ export const ProductContextProvider = ({ children }: ProductContextProps) => {
         setFavorites,
         shoppingSession,
         setShoppingSession,
+        categories,
+        setCategories,
       }}
     >
       {children}

@@ -34,6 +34,7 @@ export default function SignUp() {
     setPhoneNumber,
     token,
     setToken,
+    setIsAuthenticated,
   } = useContext(UserContext);
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -106,6 +107,7 @@ export default function SignUp() {
       );
 
       setToken(response.data.responseData.accessToken);
+      setIsAuthenticated(true);
 
       localStorage.setItem(
         "accessToken",

@@ -9,7 +9,10 @@ interface message {
 // Realizarea conexiunii dintre client și server
 export const connectToHub = async () => {
   const connection = new signalR.HubConnectionBuilder()
-    .withUrl(`http://40.113.124.53:5002/chat`, {})
+    .withUrl(`https://localhost:7196/chat`, {
+      // skipNegotiation: true, // doar pt local ?
+      // transport: signalR.HttpTransportType.WebSockets,
+    })
     .build();
 
   connection

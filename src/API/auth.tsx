@@ -1,3 +1,4 @@
+import axios from "axios";
 import instance from "./instance";
 import { ApiUrls } from "./Routes";
 
@@ -36,7 +37,16 @@ export const loginUser = async (
 };
 
 export const logoutUser = async () => {
-  const response = await instance.post(`${ApiUrls.logout}`, {});
+  console.log(localStorage.getItem("accessToken"));
+  const response = await axios.post(
+    `${ApiUrls.logout}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
 
   return response;
 };

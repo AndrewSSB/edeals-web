@@ -1,19 +1,21 @@
 import React, { useContext } from "react";
 import { Grid } from "@mui/material";
 import { ProductCard } from "./ProductCard";
-import { ProductContext } from "../../context/ProductsContext";
+import { Product, ProductContext } from "../../context/ProductsContext";
 
-export const ProductPage = () => {
-  const { products } = useContext(ProductContext);
+interface ProductPageProps {
+  products: Product[];
+}
 
+export const ProductPage = (props: ProductPageProps) => {
   return (
     <div style={{ margin: "20px 20px" }}>
       <Grid container spacing={2}>
-        {products.map((product) => (
+        {props.products.map((product) => (
           <ProductCard key={product.productId} product={product} />
         ))}
       </Grid>
-      {products.length === 0 && (
+      {props.products.length === 0 && (
         <div
           style={{
             display: "flex",

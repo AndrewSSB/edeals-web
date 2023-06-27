@@ -46,6 +46,8 @@ type UserContextType = {
   setProfileImage: (value: string) => void;
   favoriteAddress: Address;
   setFavoriteAddress: (value: Address) => void;
+  isAuthenticated: boolean;
+  setIsAuthenticated: (value: boolean) => void;
 };
 
 export const UserContext = createContext<UserContextType>(
@@ -79,6 +81,42 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
     address: "",
     addressAditionally: "",
   });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // // User Details
+  // useEffect(() => {
+  //   const isAuthenticated = localStorage.getItem("accessToken") ? true : false;
+  //   setIsAuthenticated(isAuthenticated);
+  //   const fetchUserDetails = async () => {
+  //     if (isAuthenticated) {
+  //       try {
+  //         const response = await getUser();
+
+  //         const userDetails = response.data.responseData;
+
+  //         setUserData({
+  //           firstName: userDetails.firstName,
+  //           lastName: userDetails.lastName,
+  //           userName: userDetails.userName,
+  //           email: userDetails.email,
+  //           isEmailVerified: userDetails.isEmailVerified,
+  //           phoneNumber: userDetails.phoneNumber,
+  //           isPhoneNumberVerified: userDetails.isPhoneNumberVerified,
+  //           profileImage: "",
+  //           addresses: userDetails.addresses,
+  //         });
+
+  //         setFirstName(userDetails.firstName);
+  //         setLastName(userDetails.lastName);
+  //       } catch (error: any) {
+  //         localStorage.removeItem("accessToken");
+  //         localStorage.removeItem("refreshToken");
+  //         console.error("Failed to fetch user details:", error);
+  //       }
+  //     }
+  //   };
+  //   fetchUserDetails();
+  // }, []);
 
   return (
     <UserContext.Provider
@@ -101,6 +139,8 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
         setProfileImage,
         favoriteAddress,
         setFavoriteAddress,
+        isAuthenticated,
+        setIsAuthenticated,
       }}
     >
       {children}

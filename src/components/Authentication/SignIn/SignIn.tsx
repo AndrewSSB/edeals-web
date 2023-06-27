@@ -41,8 +41,15 @@ export const Copyright = (props: any) => {
 const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function SignIn() {
-  const { email, setEmail, userName, setUserName, token, setToken } =
-    useContext(UserContext);
+  const {
+    email,
+    setEmail,
+    userName,
+    setUserName,
+    token,
+    setToken,
+    setIsAuthenticated,
+  } = useContext(UserContext);
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -66,6 +73,7 @@ export default function SignIn() {
       const response = await loginUser(userName, email, password);
 
       setToken(response.data.responseData.accessToken);
+      setIsAuthenticated(true);
 
       localStorage.setItem(
         "accessToken",

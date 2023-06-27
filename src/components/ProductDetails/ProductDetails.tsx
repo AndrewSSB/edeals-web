@@ -7,11 +7,23 @@ import {
   sendJoinChannel,
   sendLeaveChannel,
 } from "../Chat/SignalR";
-import { Product, ProductContext } from "../../context/ProductsContext";
+import {
+  Category,
+  Product,
+  ProductContext,
+} from "../../context/ProductsContext";
 import { useParams } from "react-router-dom";
 import { SwiperComponent } from "./Swiper";
 import { Navbar } from "../Navbar/Navbar";
-import { Box, Rating, Typography } from "@mui/material";
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  Rating,
+  Slide,
+  Snackbar,
+  Typography,
+} from "@mui/material";
 import { AutenticationButtons } from "../CustomButtons/CustomButtons";
 import {
   NoHoverIconButton,
@@ -23,6 +35,9 @@ import SearchIcon from "@mui/icons-material/Search";
 import { Comments } from "./Comments";
 import "./Swiper.css";
 import { Reviews } from "./Reviews";
+import React from "react";
+import { addReview, getProduct } from "../../API/products";
+import { Review } from "../Checkout/Review";
 
 export interface ChatMessage {
   date: string;
@@ -35,16 +50,29 @@ export interface ProductDetailsProps {
   product?: Product;
 }
 
+interface CategoryPathProps {
+  categoryId: number;
+  categories: Category[];
+}
+
 export const ProductDetails = (props: ProductDetailsProps) => {
   const { userData } = useContext(UserContext);
-  const [username, setUsername] = useState("Haideeee");
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [connection, setConnection] = useState<HubConnection | null>(null);
   const [channelId, setChannelId] = useState<string>("");
   const [product, setProduct] = useState<Product | undefined>();
-  const { products } = useContext(ProductContext);
+  const { products, categories } = useContext(ProductContext);
   const { productId } = useParams();
   const [search, setSearch] = useState("");
+
+  const [ratingValue, setRatingValue] = useState(0);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [showCommentForm, setShowCommentForm] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleCloseSnackbar = () => {
+    setError(null);
+  };
 
   const handleSearch = async (value: string | null) => {
     console.log("Seaching...");
@@ -73,6 +101,16 @@ export const ProductDetails = (props: ProductDetailsProps) => {
   }, []);
 
   const handleSelectedUser = async (user: string) => {
+    if (!userData.userName) {
+      setError("Trebuie să fii conectat pentru a comunica cu alți utilizatori");
+      return;
+    }
+
+    if (user === userData.userName) {
+      setError("Nu-ți poți trimite mesaje ție!");
+      return;
+    }
+
     setSelectedUser(user);
 
     try {
@@ -87,11 +125,83 @@ export const ProductDetails = (props: ProductDetailsProps) => {
     await sendLeaveChannel(connection, channelId);
   };
 
-  // SlideShowProductImages(product?.images.scrollImages);
+  const categoryTree = (
+    categoryId: number,
+    categories: Category[],
+    currentPath: Category[] = []
+  ): Category[] | undefined => {
+    for (const category of categories) {
+      if (category.categoryId === categoryId) {
+        return [...currentPath, category];
+      }
+
+      if (category.subCategories) {
+        const path = categoryTree(categoryId, category.subCategories, [
+          ...currentPath,
+          category,
+        ]);
+        if (path) {
+          return path;
+        }
+      }
+    }
+
+    return undefined;
+  };
+
+  const returnPath = (
+    categoryId: number,
+    categories: Category[]
+  ): { categoryName: string; categoryId: number }[] => {
+    const path = categoryTree(categoryId, categories);
+
+    if (path) {
+      return path.map((category) => ({
+        categoryName: category.categoryName,
+        categoryId: category.categoryId,
+      }));
+    }
+
+    return [];
+  };
+
+  const CategoryPath = (cat: CategoryPathProps) => {
+    const path = returnPath(cat.categoryId, cat.categories);
+
+    return (
+      <Typography
+        style={{ margin: "10px 0 0 50px ", fontSize: "15px", maxWidth: "70%" }}
+      >
+        {path.map((category, index) => (
+          <React.Fragment key={category.categoryId}>
+            <span
+              style={{
+                color: "#b84260",
+                cursor: "pointer",
+                textDecoration: "underline",
+              }}
+            >
+              {category.categoryName}
+            </span>
+            {index !== path.length - 1 && <span> &gt; </span>}
+          </React.Fragment>
+        ))}
+      </Typography>
+    );
+  };
 
   useEffect(() => {
-    const produs = products.find((x) => x.productId === productId);
-    setProduct(produs);
+    const fetchProduct = async () => {
+      if (productId) {
+        const response = await getProduct({ productId });
+
+        const prod = response.data.responseData;
+        prod.comments = [];
+        setProduct(prod);
+      }
+    };
+
+    fetchProduct();
   }, []);
 
   useEffect(() => {
@@ -100,16 +210,111 @@ export const ProductDetails = (props: ProductDetailsProps) => {
 
   const test = [1, 2, 3, 4, 5];
 
+  const handleReviewsComments = async (value: string) => {
+    if (!ratingValue) {
+      setError("Trebuie să selectezi o valoare pentru rating!");
+      return;
+    }
+
+    try {
+      const response = await addReview({
+        title: "",
+        comment: value,
+        productId: productId!,
+        rating: ratingValue,
+      });
+
+      setProduct((prevProduct) => {
+        if (prevProduct) {
+          const updateReviews = [
+            ...prevProduct.reviews,
+            {
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              comment: value,
+              createdAt: new Date().toDateString(),
+              email: userData.email,
+              username: userData.userName,
+              rating: ratingValue,
+              title: "",
+              hasBoughtProduct: false,
+            },
+          ];
+          return {
+            ...prevProduct,
+            reviews: updateReviews,
+          };
+        }
+        return prevProduct;
+      });
+
+      setShowReviewForm(false);
+      setRatingValue(0);
+    } catch (e: any) {
+      if (e.response.status === 401) {
+        setError("Trebuie sa fii autentificat pentru a putea lăsa o recenzie");
+      }
+    }
+  };
+
+  const handleQuestionsComments = async (value: string) => {
+    try {
+      // const response = await addReview({
+      //   title: "",
+      //   comment: value,
+      //   productId: productId!,
+      //   rating: ratingValue,
+      // });
+
+      setProduct((prevProduct) => {
+        if (prevProduct) {
+          const updateComments = [
+            ...prevProduct.comments,
+            {
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              comment: value,
+              createdAt: new Date().toDateString(),
+              username: userData.userName,
+            },
+          ];
+          return {
+            ...prevProduct,
+            comments: updateComments,
+          };
+        }
+        return prevProduct;
+      });
+
+      setShowCommentForm(false);
+    } catch (e: any) {
+      if (e.response.status === 401) {
+        setError("Trebuie sa fii autentificat pentru a putea lăsa o întrebare");
+      }
+    }
+  };
+
+  const calculateAverageRating = () => {
+    if (product?.reviews.length === 0) {
+      return 0;
+    }
+
+    const totalRating = product?.reviews.reduce(
+      (sum, review) => sum + review.rating,
+      0
+    );
+    const averageRating = totalRating! / product?.reviews.length!;
+    return +averageRating.toFixed(2);
+  };
+
   return (
     <div>
       <Navbar />
-      <Typography
-        style={{ margin: "10px 0 0 50px ", fontSize: "15px", maxWidth: "70%" }}
-      >
-        <span style={{ color: "#b84260" }}>
-          Calculatoare si accesorii {">"} Calculatoare si Monitoare
-        </span>
-      </Typography>
+
+      <CategoryPath
+        categoryId={product?.categories.categoryId!}
+        categories={categories}
+      />
       <Typography
         style={{ margin: "50px 0 0 50px ", fontSize: "20px", maxWidth: "70%" }}
       >
@@ -266,11 +471,14 @@ export const ProductDetails = (props: ProductDetailsProps) => {
                 margin: "20px 0px 20px 40px",
               }}
             >
-              <span style={{ fontSize: "40px" }}>5.00</span>
+              <span style={{ fontSize: "40px" }}>
+                {calculateAverageRating()}
+              </span>
               <Rating
                 name="product-rating"
                 precision={0.5}
-                value={5}
+                value={calculateAverageRating()}
+                readOnly
                 style={{
                   fontSize: "36px",
                   marginTop: "10px",
@@ -284,7 +492,8 @@ export const ProductDetails = (props: ProductDetailsProps) => {
                   fontStyle: "italic",
                 }}
               >
-                10 recenzii
+                {product?.reviews.length}{" "}
+                {product?.reviews.length == 1 ? "recenzie" : "recenzii"}
               </span>
             </div>
             <div
@@ -298,29 +507,92 @@ export const ProductDetails = (props: ProductDetailsProps) => {
             >
               <Rating
                 name="product-rating"
-                precision={0.5}
+                precision={0.2}
                 style={{
                   fontSize: "36px",
                   marginTop: "10px",
                   marginLeft: "-2px",
+                }}
+                value={ratingValue}
+                onChange={(event, value) => {
+                  if (value !== null) {
+                    setRatingValue(value);
+                  }
                 }}
               />
               <span>Ai achiziționat produsul ? </span>
               <AutenticationButtons
                 buttonText={"Lasă o recenzie"}
                 style={{ width: "60%", height: "30%" }}
+                onClick={() => setShowReviewForm(true)}
               />
             </div>
           </div>
-          {test.map((x, idx) => {
-            return (
-              <div key={idx}>
-                <div className="gray-line" />
-                <Reviews onClick={() => handleSelectedUser("Bogdan")} />
+          {showReviewForm && (
+            <div>
+              <div className="gray-line" />
+              <Reviews
+                showForm={showReviewForm}
+                saveReview={handleReviewsComments}
+                closeReview={() => {
+                  setShowReviewForm(false);
+                  setRatingValue(0);
+                }}
+              />
+            </div>
+          )}
+          {product?.reviews.length === 0 && !showReviewForm && (
+            <div style={{ height: "80px", backgroundColor: "white" }}>
+              <div className="gray-line" />
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "column",
+                  height: "100%",
+                }}
+              >
+                <Typography>
+                  Încă nu sunt recenzii pentru{" "}
+                  <span style={{ fontStyle: "italic", color: "#b84260" }}>
+                    {product.name}
+                  </span>
+                </Typography>
+                <span
+                  style={{
+                    fontStyle: "italic",
+                    color: "#b84260",
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                    marginTop: "10px",
+                  }}
+                  onClick={() => setShowReviewForm(true)}
+                >
+                  Lasă o recenzie
+                </span>
               </div>
-            );
-          })}
+            </div>
+          )}
+          {product?.reviews &&
+            product.reviews.length > 0 &&
+            product?.reviews.map((x, idx) => {
+              return (
+                <div key={idx}>
+                  <div className="gray-line" />
+                  <Reviews
+                    onClick={() => handleSelectedUser(x.username)}
+                    username={x.username}
+                    message={x.comment}
+                    initialsName={x.firstName[0] + x.lastName[0]}
+                    date={x.createdAt}
+                    rating={x.rating}
+                  />
+                </div>
+              );
+            })}
         </div>
+        <div className="gray-line" />
         <div>
           <div
             style={{
@@ -336,18 +608,65 @@ export const ProductDetails = (props: ProductDetailsProps) => {
               Întrebări și răspunsuri
             </Typography>
             <AutenticationButtons
+              onClick={() => setShowCommentForm(true)}
               buttonText={"Adaugă o întrebare"}
               style={{ marginRight: "30px", width: "20%" }}
             />
           </div>
-          {test.map((x, idx) => {
-            return (
-              <div key={idx}>
-                <div className="gray-line" />
-                <Comments onClick={() => handleSelectedUser("Mihai")} />
+          {showCommentForm && (
+            <div>
+              <div className="gray-line" />
+              <Comments
+                showForm={showCommentForm}
+                saveComment={handleQuestionsComments}
+                closeComment={() => setShowCommentForm(false)}
+              />
+            </div>
+          )}
+          {product?.comments.length === 0 && !showCommentForm && (
+            <div style={{ height: "80px", backgroundColor: "white" }}>
+              <div className="gray-line" />
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "column",
+                  height: "100%",
+                }}
+              >
+                <Typography>Ai vreo întrebare?</Typography>
+                <span
+                  style={{
+                    fontStyle: "italic",
+                    color: "#b84260",
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                    marginTop: "10px",
+                  }}
+                  onClick={() => setShowCommentForm(true)}
+                >
+                  Adaugă una aici
+                </span>
               </div>
-            );
-          })}
+            </div>
+          )}
+          {product?.comments &&
+            product.comments.length > 0 &&
+            product?.comments.map((x, idx) => {
+              return (
+                <div key={idx}>
+                  <div className="gray-line" />
+                  <Comments
+                    onClick={() => handleSelectedUser(x.username)}
+                    username={x.username}
+                    message={x.comment}
+                    initialsName={x.firstName[0] + x.lastName[0]}
+                    date={x.createdAt}
+                  />
+                </div>
+              );
+            })}
         </div>
       </section>
 
@@ -372,6 +691,19 @@ export const ProductDetails = (props: ProductDetailsProps) => {
           />
         </div>
       )}
+      <Snackbar
+        open={!!error}
+        autoHideDuration={4000}
+        message={error}
+        onClose={handleCloseSnackbar}
+        TransitionComponent={Slide}
+        TransitionProps={{ timeout: 500 }}
+      >
+        <Alert severity="error" onClose={handleCloseSnackbar}>
+          <AlertTitle>Error</AlertTitle>
+          {error}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

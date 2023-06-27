@@ -9,6 +9,8 @@ import {
   getFavorites,
   getShoppingSession,
 } from "../../API/products";
+import { UserContext } from "../../context/UserContext";
+import { DeleteProductsFromLocalStorage } from "../../hooks/SetItemsToLocalStorage";
 
 export interface ProductCardProps {
   showQuantity: boolean;
@@ -19,33 +21,67 @@ export interface ProductCardProps {
 }
 export const LittleProductCard = (props: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { setShoppingSession, setFavorites } = useContext(ProductContext);
+  const { shoppingSession, setShoppingSession, favorites, setFavorites } =
+    useContext(ProductContext);
+  const { isAuthenticated } = useContext(UserContext);
 
   const removeCartItem = async (id: number | string) => {
     if (props.isBasket) {
-      await deleteCartItem(id);
+      const localCartItems = shoppingSession.cartItems.filter(
+        (prod) => prod.productId !== props.product.productId
+      );
+      if (isAuthenticated) {
+        try {
+          await deleteCartItem(id);
 
-      try {
-        const response = await getShoppingSession(1000);
+          const response = await getShoppingSession(1000);
 
-        const responseData = response.data.responseData;
-        setShoppingSession(responseData);
-      } catch (error: any) {
-        setShoppingSession({ shoppingSessionId: 0, cartItems: [], total: 0 });
-        console.error("Failed to fetch favorites", error);
+          const responseData = response.data.responseData;
+          setShoppingSession(responseData);
+        } catch (error: any) {
+          setShoppingSession({ shoppingSessionId: 0, cartItems: [], total: 0 });
+          console.error("Failed to fetch favorites", error);
+        }
+      } else {
+        setShoppingSession({
+          total: +localCartItems
+            .reduce((accumulator, item) => {
+              return accumulator + +item.productPrice * item.quantity;
+            }, 0)
+            .toFixed(2),
+          shoppingSessionId: 0,
+          cartItems: localCartItems,
+        });
+        DeleteProductsFromLocalStorage({
+          keyName: "cartItems",
+          productId: props.product.productId,
+        });
       }
     } else {
-      await deleteFavorites(id);
+      const localFavorites = favorites.filter(
+        (product) => product.productId != props.product.productId
+      );
 
-      try {
-        const response = await getFavorites();
+      if (isAuthenticated) {
+        await deleteFavorites(id);
 
-        const responseData = response.data.responseData;
+        try {
+          const response = await getFavorites();
 
-        setFavorites(responseData);
-      } catch (error: any) {
-        setFavorites([]);
-        console.error("Failed to fetch favorites", error);
+          const responseData = response.data.responseData;
+
+          setFavorites(responseData);
+        } catch (error: any) {
+          setFavorites([]);
+          console.error("Failed to fetch favorites", error);
+        }
+      } else {
+        setFavorites(localFavorites);
+
+        DeleteProductsFromLocalStorage({
+          keyName: "favorite",
+          productId: props.product.productId,
+        });
       }
     }
   };

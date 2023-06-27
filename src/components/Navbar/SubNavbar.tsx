@@ -1,10 +1,17 @@
 import { Toolbar } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { DropdownContent } from "./DropdownContent";
 import { CategoriesDropdown } from "./CategoriesDropdown";
-export const SubNavBar = () => {
+import { ProductContext } from "../../context/ProductsContext";
+
+interface SubNavBarProps {
+  onClick: (value: number) => void;
+}
+
+export const SubNavBar = (props: SubNavBarProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const { categories, setCategories } = useContext(ProductContext);
 
   return (
     <div
@@ -41,24 +48,27 @@ export const SubNavBar = () => {
           >
             Produse
           </span>
+          {isHovered && (
+            <div
+              style={{
+                position: "absolute",
+                top: "100%",
+                right: "auto",
+                left: "20px",
+                width: "250px",
+                backgroundColor: "white",
+                padding: "20px",
+                boxShadow: "0px 2px 4px rgba(100, 111, 203, 0.6)",
+                zIndex: 1,
+              }}
+            >
+              <CategoriesDropdown
+                categories={categories}
+                onClick={props.onClick}
+              />
+            </div>
+          )}
         </div>
-        {isHovered && (
-          <div
-            style={{
-              position: "absolute",
-              top: "100%",
-              right: "auto",
-              left: "20px",
-              width: "250px",
-              backgroundColor: "white",
-              padding: "20px",
-              boxShadow: "0px 2px 4px rgba(100, 111, 203, 0.6)",
-              zIndex: 1,
-            }}
-          >
-            <CategoriesDropdown />
-          </div>
-        )}
       </Toolbar>
     </div>
   );

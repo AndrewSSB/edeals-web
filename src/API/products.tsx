@@ -31,6 +31,42 @@ export const getProducts = async (props: ProductsProps) => {
   return response;
 };
 
+export const getProduct = async (props: FavoriteProps) => {
+  const response = await axios.get(`${ApiUrls.getProduct}/${props.productId}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+  });
+
+  return response;
+};
+
+interface AddReviewProps {
+  rating: number;
+  title: string;
+  comment: string;
+  productId: string;
+}
+
+export const addReview = async (props: AddReviewProps) => {
+  const response = await axios.post(
+    `${ApiUrls.addReview}`,
+    {
+      productId: props.productId,
+      rating: props.rating,
+      comment: props.comment,
+      title: props.title,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
+
+  return response;
+};
+
 // Favorites
 
 export const addFavorites = async (props: FavoriteProps) => {
@@ -113,6 +149,16 @@ export const addCartItems = async (props: CartItemProps) => {
 
 export const deleteCartItem = async (id: number | string) => {
   const response = await axios.delete(`${ApiUrls.deleteCartItem}/${id}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+  });
+
+  return response;
+};
+
+export const getCategories = async () => {
+  const response = await axios.get(`${ApiUrls.categories}`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
     },

@@ -1,4 +1,6 @@
-import { Avatar } from "@mui/material";
+import { Avatar, TextField } from "@mui/material";
+import { AutenticationButtons } from "../CustomButtons/CustomButtons";
+import { useState } from "react";
 
 interface CommentsProps {
   username?: string;
@@ -6,9 +8,20 @@ interface CommentsProps {
   message?: string;
   date?: string;
   onClick?: () => void;
+  showForm?: boolean;
+  saveComment?: (value: string) => void;
+  closeComment?: () => void;
 }
 
 export const Comments = (props: CommentsProps) => {
+  const [reviewText, setReviewText] = useState("");
+
+  const handleReviewTextChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setReviewText(event.target.value);
+  };
+
   return (
     <div
       style={{
@@ -49,34 +62,76 @@ export const Comments = (props: CommentsProps) => {
           </Avatar>
         </div>
       </div>
-      <div
-        style={{
-          margin: "35px 0px 40px 20px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "start",
-        }}
-      >
-        <span
-          onClick={props?.onClick}
-          style={{ cursor: "pointer", height: "15px", width: "10px" }}
-        >
-          Mihai
-        </span>
-        <span
+      {!props.showForm ? (
+        <div
           style={{
-            marginTop: "10px",
-            fontSize: "12px",
-            fontStyle: "italic",
-            color: "#6b6b6b",
+            margin: "35px 0px 40px 20px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "start",
           }}
         >
-          06 iunie 2023
-        </span>
-        <span style={{ wordBreak: "break-word", margin: "20px 50px 0 0px" }}>
-          Cum se descurcă în editarea video acest sistem all in one ?
-        </span>
-      </div>
+          <span
+            onClick={props?.onClick}
+            style={{ cursor: "pointer", height: "15px", width: "10px" }}
+          >
+            {props.username}
+          </span>
+          <span
+            style={{
+              marginTop: "10px",
+              fontSize: "12px",
+              fontStyle: "italic",
+              color: "#6b6b6b",
+            }}
+          >
+            {new Date(props.date!).toLocaleDateString()}
+          </span>
+          <span style={{ wordBreak: "break-word", margin: "20px 50px 0 0px" }}>
+            {props.message}
+          </span>
+        </div>
+      ) : (
+        <div
+          style={{
+            height: "100%",
+            width: "90%",
+            margin: "35px 0px 40px 20px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "start",
+          }}
+        >
+          <TextField
+            value={reviewText}
+            onChange={handleReviewTextChange}
+            multiline
+            rows={4}
+            placeholder="Scrie intrebarea ta..."
+            style={{
+              marginBottom: "16px",
+            }}
+          />
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <AutenticationButtons
+              buttonText={"Salvează"}
+              style={{ width: "10%", height: "30%" }}
+              onClick={() => props.saveComment!(reviewText)}
+            />
+            <AutenticationButtons
+              buttonText={"Închide"}
+              style={{ width: "10%", height: "30%" }}
+              onClick={props.closeComment}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

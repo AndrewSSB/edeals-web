@@ -1,9 +1,13 @@
+const localUrl = "https://localhost:7056";
+const prodUrl = "http://40.113.124.53:5000";
+
 type apiUrls = {
   login: string;
   register: string;
   logout: string;
   userInfo: string;
   getProducts: string;
+  getProduct: string;
   addFavorite: string;
   deleteFavorite: string;
   getFavorite: string;
@@ -14,26 +18,33 @@ type apiUrls = {
 
   paymentIntent: string;
   messages: string;
+  categories: string;
+  addReview: string;
 };
 
 export const ApiUrls: apiUrls = {
-  login: "http://40.113.124.53:5000/core/api/authentication/login",
-  register: "http://40.113.124.53:5000/core/api/authentication/register",
-  logout: "http://40.113.124.53:5000/core/api/authentication/logout",
-  userInfo: "http://40.113.124.53:5000/core/api/user/info",
+  login: `${localUrl}/core/api/authentication/login`,
+  register: `${localUrl}/core/api/authentication/register`,
+  logout: `${localUrl}/core/api/authentication/logout`,
+  userInfo: `${localUrl}/core/api/user/info`,
 
-  getProducts: "http://40.113.124.53:5000/catalog/api/product/all",
+  getProducts: `${localUrl}/catalog/api/product/all`,
+  getProduct: `${localUrl}/catalog/api/product`,
 
-  addFavorite: "http://40.113.124.53:5000/catalog/api/favorites",
-  deleteFavorite: "http://40.113.124.53:5000/catalog/api/favorites",
-  getFavorite: "http://40.113.124.53:5000/catalog/api/favorites",
+  addFavorite: `${localUrl}/catalog/api/favorites`,
+  deleteFavorite: `${localUrl}/catalog/api/favorites`,
+  getFavorite: `${localUrl}/catalog/api/favorites`,
 
-  getShoppingSession: "http://40.113.124.53:5000/catalog/api/shoppingsession",
-  getCartItems: "http://40.113.124.53:5000/catalog/api/cartitem/all",
-  addCartItem: "http://40.113.124.53:5000/catalog/api/cartitem",
-  deleteCartItem: "http://40.113.124.53:5000/catalog/api/cartitem",
+  getShoppingSession: `${localUrl}/catalog/api/shoppingsession`,
+  getCartItems: `${localUrl}/catalog/api/cartitem/all`,
+  addCartItem: `${localUrl}/catalog/api/cartitem`,
+  deleteCartItem: `${localUrl}/catalog/api/cartitem`,
 
-  paymentIntent: "http://40.113.124.53:5000/catalog/api/paymentcontroll",
+  paymentIntent: `${localUrl}/catalog/api/paymentcontroll`,
 
-  messages: "http://40.113.124.53:5000/catalog/api/messages",
+  messages: `${localUrl}/catalog/api/messages`,
+
+  categories: `${localUrl}/catalog/api/category/all`,
+
+  addReview: `${localUrl}/catalog/api/review`,
 };

@@ -37,6 +37,7 @@ const myChats: CSSProperties = {
   textAlign: "right",
   whiteSpace: "pre-wrap",
   wordWrap: "break-word",
+  overflowWrap: "break-word",
 };
 
 const otherChats: CSSProperties = {
@@ -166,6 +167,7 @@ export const ChatBox = (props: ChatBoxProps) => {
 
           return (
             <div
+              key={index}
               style={
                 receivedMessage.sender === props.myUsername
                   ? myMessages
@@ -186,7 +188,6 @@ export const ChatBox = (props: ChatBoxProps) => {
               )}
 
               <div
-                key={index}
                 style={
                   receivedMessage.sender === props.myUsername
                     ? myChats

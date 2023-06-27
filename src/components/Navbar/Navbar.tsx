@@ -29,6 +29,8 @@ import { ProductContext } from "../../context/ProductsContext";
 import { LittleProductPage } from "../Products/LitttleProdcutPage";
 import Payment from "../Payments/Payment";
 import { getUser } from "../../API/user";
+import { GetProductsFromLocalStorage } from "../../hooks/SetItemsToLocalStorage";
+import { logoutUser } from "../../API/auth";
 
 interface NavBarProps {
   isInBasketPage?: Boolean;
@@ -37,6 +39,7 @@ interface NavBarProps {
 
 export const Navbar = (props: NavBarProps) => {
   const {
+    products,
     setProducts,
     setPageSize,
     setTotalPageNumber,
@@ -49,10 +52,18 @@ export const Navbar = (props: NavBarProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isFavoriteHovered, setIsFavoriteHovered] = useState(false);
   const [isBasketHovered, setIsBasketHovered] = useState(false);
-  const { userData, setUserData, setLastName, setFirstName } =
-    useContext(UserContext);
+  const {
+    userData,
+    setUserData,
+    setFirstName,
+    setLastName,
+    isAuthenticated,
+    setIsAuthenticated,
+  } = useContext(UserContext);
   const [search, setSearch] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const hasFavorite = favorites.length > 0;
+  const navigate = useNavigate();
 
   const searchChange = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
@@ -60,74 +71,89 @@ export const Navbar = (props: NavBarProps) => {
     }
   };
 
+  // Favorites And Cart Items and UserDetails
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("accessToken") ? true : false;
     setIsAuthenticated(isAuthenticated);
-  }, []);
 
-  useEffect(() => {
-    const fetchCartItems = async () => {
-      try {
-        const response = await getShoppingSession(1);
-
-        const responseData = response.data.responseData;
-        setShoppingSession(responseData);
-      } catch (error: any) {
-        console.error("Failed to fetch shopping session:", error);
-      }
-    };
-
-    fetchCartItems();
-  }, []);
-
-  useEffect(() => {
     const fetchFavorites = async () => {
-      try {
-        const response = await getFavorites();
+      const favoritesFromLocalStorage = GetProductsFromLocalStorage({
+        keyName: "favorite",
+      });
 
-        const responseData = response.data.responseData;
+      const productsFromLocal = products.filter((product) => {
+        if (favoritesFromLocalStorage) {
+          return favoritesFromLocalStorage.find(
+            (prd) => prd.productId === product.productId
+          );
+        }
+        return false;
+      });
 
-        setFavorites(responseData);
-      } catch (error: any) {
-        console.error("Failed to fetch favorite products:", error);
+      if (isAuthenticated) {
+        try {
+          const response = await getFavorites();
+
+          const responseData = response.data.responseData;
+
+          setFavorites(responseData);
+        } catch (error: any) {
+          console.error("Failed to fetch favorite products:", error);
+        }
+      } else {
+        setFavorites(productsFromLocal);
       }
     };
 
-    fetchFavorites();
-  }, []);
+    const fetchCartItems = async () => {
+      const cartItemsFromLocalStorage = GetProductsFromLocalStorage({
+        keyName: "cartItems",
+      });
 
-  const clearSearch = () => {
-    setSearch("");
-    handleSearch(null);
-  };
+      const productsFromLocal = products.filter((product) => {
+        if (cartItemsFromLocalStorage) {
+          return cartItemsFromLocalStorage.find(
+            (prd) => prd.productId === product.productId
+          );
+        }
+        return false;
+      });
 
-  const navigate = useNavigate();
+      if (isAuthenticated) {
+        try {
+          const response = await getShoppingSession(1);
 
-  const handleSearch = async (value: string | null) => {
-    const response = await getProducts({
-      start: null,
-      limit: null,
-      productName: value,
-    });
+          const responseData = response.data.responseData;
+          setShoppingSession(responseData);
+        } catch (error: any) {
+          console.error("Failed to fetch shopping session:", error);
+        }
+      } else {
+        shoppingSession.cartItems = productsFromLocal.map((prod, idx) => {
+          return {
+            cartItemId: idx,
+            productId: prod.productId,
+            productName: prod.name,
+            quantity: 0,
+            shoppingSessionId: 0,
+            image: prod.images.mainImage,
+            productPrice: prod.price.toString(),
+            description: prod.shortDescription,
+          };
+        });
 
-    const responseData = response.data.responseData;
-    setProducts(responseData.data);
-    setPageSize(responseData.pageSize);
-    setTotalPageNumber(responseData.totalPageNumber);
-    setCurrentPageNumber(responseData.currentPageNumber);
-  };
+        shoppingSession.total = +shoppingSession.cartItems
+          .reduce((accumulator, item) => {
+            return accumulator + +item.productPrice * item.quantity;
+          }, 0)
+          .toFixed(2);
 
-  const hasFavorite = favorites.length > 0;
+        setShoppingSession(shoppingSession);
+      }
+    };
 
-  const goToWelcome = () => {
-    navigate("/");
-  };
-
-  // console.log(isHovered);
-
-  useEffect(() => {
-    if (localStorage.getItem("accessToken")) {
-      const fetchUserDetails = async () => {
+    const fetchUserDetails = async () => {
+      if (isAuthenticated) {
         try {
           const response = await getUser();
 
@@ -149,13 +175,52 @@ export const Navbar = (props: NavBarProps) => {
           setLastName(userDetails.lastName);
         } catch (error: any) {
           localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
           console.error("Failed to fetch user details:", error);
         }
-      };
+      }
+    };
 
-      fetchUserDetails();
-    }
+    fetchFavorites();
+    fetchCartItems();
+    fetchUserDetails();
   }, []);
+
+  const clearSearch = () => {
+    setSearch("");
+    handleSearch(null);
+  };
+
+  const handleSearch = async (value: string | null) => {
+    const response = await getProducts({
+      start: null,
+      limit: null,
+      productName: value,
+    });
+
+    const responseData = response.data.responseData;
+    setProducts(responseData.data);
+    setPageSize(responseData.pageSize);
+    setTotalPageNumber(responseData.totalPageNumber);
+    setCurrentPageNumber(responseData.currentPageNumber);
+  };
+
+  const goToWelcome = () => {
+    navigate("/");
+  };
+
+  const SignOut = async () => {
+    try {
+      await logoutUser();
+
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+
+      window.location.reload();
+    } catch (ex) {
+      console.error(ex);
+    }
+  };
 
   return (
     <NavbarContainer position="sticky" color="default">
@@ -266,6 +331,12 @@ export const Navbar = (props: NavBarProps) => {
                   buttonText="Vezi profilul"
                   buttonWidth="100%"
                   onClick={() => navigate("/profile")}
+                />
+                <AutenticationButtons
+                  style={{ marginTop: "20px" }}
+                  buttonText="Logout"
+                  buttonWidth="100%"
+                  onClick={SignOut}
                 />
               </div>
             )}
@@ -438,7 +509,7 @@ export const Navbar = (props: NavBarProps) => {
                         margin: "10px 0 0 0",
                       }}
                     >
-                      TOTAL: {shoppingSession.total} lei
+                      TOTAL: {+shoppingSession.total.toFixed(2)} lei
                     </div>
                     <div style={{ margin: "8px 0" }}></div>
                     <AutenticationButtons
