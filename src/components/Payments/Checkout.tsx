@@ -11,6 +11,7 @@ import {
   PaymentIntentResult,
   StripeLinkAuthenticationElementChangeEvent,
 } from "@stripe/stripe-js";
+import { useNavigate } from "react-router-dom";
 
 interface CheckoutFormProps {
   clientSecret: string;
@@ -71,7 +72,7 @@ export default function CheckoutForm({
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: "http://localhost:3000",
+        return_url: `${process.env.REACT_APP_APP_URL}`,
         receipt_email: email,
       },
     });
@@ -96,6 +97,12 @@ export default function CheckoutForm({
     };
   }, []);
 
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    navigate("/");
+  };
+
   return (
     <form id="payment-form" onSubmit={handleSubmit}>
       <LinkAuthenticationElement
@@ -105,11 +112,26 @@ export default function CheckoutForm({
         }
       />
       <PaymentElement id="payment-element" options={paymentElementOptions} />
-      <button disabled={isLoading || !stripe || !elements} id="submit">
-        <span id="button-text">
-          {isLoading ? <div className="spinner" id="spinner"></div> : "Pay now"}
-        </span>
-      </button>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-evenly",
+        }}
+      >
+        <button type="button" id="submit" onClick={handleBack}>
+          <span id="button-text">Întoarce-te</span>
+        </button>
+        <button disabled={isLoading || !stripe || !elements} id="submit">
+          <span id="button-text">
+            {isLoading ? (
+              <div className="spinner" id="spinner"></div>
+            ) : (
+              "Plătește"
+            )}
+          </span>
+        </button>
+      </div>
       {message && <div id="payment-message">{message}</div>}
     </form>
   );

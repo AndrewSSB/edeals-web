@@ -146,7 +146,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
-    <Grid item xs={2} sm={2} md={3} lg={2}>
+    <Grid item xs={8} sm={4} md={3} lg={2}>
       <Card
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -159,78 +159,95 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         }}
       >
         <CardWrapper
-          style={{ cursor: "pointer", height: "280px" }}
-          onClick={() => handleProductDetails(product.productId)}
+          style={{ cursor: "pointer", height: "100%", paddingBottom: "0" }}
         >
-          <CardImage>
-            <img src={product.images.mainImage} alt={product.name} />
-          </CardImage>
-          <CardContent
-            style={{
-              marginTop: "15px",
-              maxHeight: "20px",
-              paddingLeft: "0",
-              cursor: "pointer",
-            }}
-          >
-            <ProductDescription
-              variant="h6"
-              style={{ fontSize: "15px", paddingLeft: "2px" }}
-            >
-              {product.shortDescription}
-            </ProductDescription>
-            <Rating
-              name="product-rating"
-              value={calculateAverageRating(product)}
-              precision={0.2}
-              readOnly
-              style={{ fontSize: "18px", marginTop: "10px" }}
-            />
-          </CardContent>
-        </CardWrapper>
-        <div style={{ border: "1px solid #e0e0e0", width: "auto" }} />
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            height: "60px",
-            padding: "0 10px",
-          }}
-        >
-          <div style={{ color: "#646FCB" }}>
-            <span
+          <div onClick={() => handleProductDetails(product.productId)}>
+            <CardImage>
+              <img src={product.images.mainImage} alt={product.name} />
+            </CardImage>
+            <CardContent
               style={{
-                fontSize: "18px",
-                fontFamily: "sans-serif",
-                fontWeight: "600",
+                marginTop: "15px",
+                maxHeight: "20px",
+                paddingLeft: "0",
+                cursor: "pointer",
               }}
             >
-              {product.price} Lei
-            </span>
+              <ProductDescription
+                variant="h6"
+                style={{ fontSize: "15px", paddingLeft: "2px" }}
+              >
+                {product.shortDescription}
+              </ProductDescription>
+              <Rating
+                name="product-rating"
+                value={calculateAverageRating(product)}
+                precision={0.2}
+                readOnly
+                style={{ fontSize: "18px", marginTop: "10px" }}
+              />
+            </CardContent>
           </div>
-          <NoHoverIconButton
-            onClick={() =>
-              handleFavorites(product, favorites, setFavorites, isAuthenticated)
-            }
+
+          <CardContent
+            style={{
+              marginTop: "50px",
+              width: "100%",
+              paddingLeft: "0",
+              paddingBottom: "0",
+            }}
           >
-            <FavoriteIcon sx={{ color: "#646FCB" }} />
-          </NoHoverIconButton>
-          <NoHoverIconButton
-            onClick={() =>
-              handleCartItems(
-                1,
-                product,
-                isAuthenticated,
-                shoppingSession,
-                setShoppingSession
-              )
-            }
-          >
-            <ShoppingCartIcon sx={{ color: "#646FCB" }} />
-          </NoHoverIconButton>
-        </div>
+            <div style={{ border: "1px solid #e0e0e0", width: "auto" }} />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                height: "40px",
+                paddingTop: "10px",
+                paddingLeft: "5px",
+              }}
+            >
+              <div style={{ color: "#646FCB" }}>
+                <span
+                  style={{
+                    fontSize: "18px",
+                    fontFamily: "sans-serif",
+                    fontWeight: "600",
+                  }}
+                >
+                  {product.price} Lei
+                </span>
+              </div>
+              <NoHoverIconButton
+                onClick={() =>
+                  handleFavorites(
+                    product,
+                    favorites,
+                    setFavorites,
+                    isAuthenticated
+                  )
+                }
+              >
+                <FavoriteIcon sx={{ color: "#646FCB" }} />
+              </NoHoverIconButton>
+              <NoHoverIconButton
+                onClick={() =>
+                  handleCartItems(
+                    1,
+                    product,
+                    isAuthenticated,
+                    shoppingSession,
+                    setShoppingSession
+                  )
+                }
+              >
+                <ShoppingCartIcon sx={{ color: "#646FCB" }} />
+              </NoHoverIconButton>
+            </div>
+          </CardContent>
+        </CardWrapper>
       </Card>
     </Grid>
   );

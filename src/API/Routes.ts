@@ -1,5 +1,5 @@
-const localUrl = "https://localhost:7056";
-const prodUrl = "http://40.113.124.53:5000";
+// export const localUrl = "https://localhost:7056";
+// export const prodUrl = "http://40.113.124.53:5000";
 
 type apiUrls = {
   login: string;
@@ -28,35 +28,35 @@ type apiUrls = {
 };
 
 export const ApiUrls: apiUrls = {
-  login: `${localUrl}/core/api/authentication/login`,
-  register: `${localUrl}/core/api/authentication/register`,
-  logout: `${localUrl}/core/api/authentication/logout`,
-  userInfo: `${localUrl}/core/api/user/info`,
+  login: `${process.env.REACT_APP_BASE_API_URL}/core/api/authentication/login`,
+  register: `${process.env.REACT_APP_BASE_API_URL}/core/api/authentication/register`,
+  logout: `${process.env.REACT_APP_BASE_API_URL}/core/api/authentication/logout`,
+  userInfo: `${process.env.REACT_APP_BASE_API_URL}/core/api/user/info`,
 
-  getProducts: `${localUrl}/catalog/api/product/all`,
-  getProduct: `${localUrl}/catalog/api/product`,
+  getProducts: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/product/all`,
+  getProduct: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/product`,
 
-  addFavorite: `${localUrl}/catalog/api/favorites`,
-  deleteFavorite: `${localUrl}/catalog/api/favorites`,
-  getFavorite: `${localUrl}/catalog/api/favorites`,
+  addFavorite: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/favorites`,
+  deleteFavorite: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/favorites`,
+  getFavorite: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/favorites`,
 
-  getShoppingSession: `${localUrl}/catalog/api/shoppingsession`,
-  getCartItems: `${localUrl}/catalog/api/cartitem/all`,
-  addCartItem: `${localUrl}/catalog/api/cartitem`,
-  deleteCartItem: `${localUrl}/catalog/api/cartitem`,
+  getShoppingSession: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/shoppingsession`,
+  getCartItems: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/cartitem/all`,
+  addCartItem: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/cartitem`,
+  deleteCartItem: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/cartitem`,
 
-  paymentIntent: `${localUrl}/catalog/api/paymentcontroll`,
+  paymentIntent: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/paymentcontroll`,
 
-  messages: `${localUrl}/catalog/api/messages`,
+  messages: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/messages`,
 
-  categories: `${localUrl}/catalog/api/category/all`,
+  categories: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/category/all`,
 
-  addReview: `${localUrl}/catalog/api/review/review`,
-  addQuestion: `${localUrl}/catalog/api/review/question`,
+  addReview: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/review/review`,
+  addQuestion: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/review/question`,
 
-  applyShoppingDiscount: `${localUrl}/catalog/api/shoppingsession/apply-discount`,
-  getDiscount: `${localUrl}/catalog/api/discount`,
+  applyShoppingDiscount: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/shoppingsession/apply-discount`,
+  getDiscount: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/discount`,
 
-  saveAddress: `${localUrl}/catalog/api/userinfo/save-address`,
-  getAddress: `${localUrl}/catalog/api/userinfo`,
+  saveAddress: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/userinfo/save-address`,
+  getAddress: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/userinfo`,
 };

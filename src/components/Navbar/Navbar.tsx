@@ -219,7 +219,7 @@ export const Navbar = (props: NavBarProps) => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
 
-      navigate("/");
+      window.location.href = "/";
     } catch (ex) {
       console.error(ex);
     }

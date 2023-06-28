@@ -5,6 +5,7 @@ import {
   Avatar,
   Box,
   Button,
+  Grid,
   Typography,
   keyframes,
   styled,
@@ -84,8 +85,6 @@ const ProfileData = (props: ProfileDataProps) => {
     </div>
   );
 };
-
-const test = [1, 2, 3, 4, 5, 6, 7, 8, 10];
 
 const bounceAnimation = keyframes`
   0% {
@@ -171,268 +170,281 @@ export const UserProfile = () => {
   const { userData, setUserData } = useContext(UserContext);
 
   return (
-    <div style={{ backgroundColor: "#F7F7F7", minHeight: "100vh" }}>
-      <Navbar />
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-evenly",
-          marginTop: "20px",
-        }}
-      >
-        <Box
-          sx={{
-            backgroundColor: "white",
-            borderRadius: "5px",
-            width: "480px",
-            height: "480px",
-            maxWidth: "520px",
-            maxHeight: "540px",
-            boxShadow: "0px 0px 10px rgba(100, 111, 203, 0.6)",
-          }}
+    <Grid item xs={8} sm={4} md={3} lg={2}>
+      <div style={{ backgroundColor: "#F7F7F7", minHeight: "100vh" }}>
+        <Navbar />
+        <Grid
+          container
+          spacing={2}
+          justifyContent="space-evenly"
+          marginTop="30px"
         >
-          <Typography
-            variant="h6"
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              paddingTop: "10px",
-            }}
-          >
-            Contul meu
-          </Typography>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginTop: "20px",
-            }}
-          >
-            {userData && userData.profileImage ? (
-              <Avatar
-                alt="User Image"
-                src={userData.profileImage}
-                sx={{ width: "80px", height: "80px" }}
-              />
-            ) : (
-              <Avatar
-                sx={{
-                  bgcolor: "#646FCB",
-                  color: "#fff",
-                  fontSize: 36,
-                  width: "80px",
-                  height: "80px",
+          <Grid item>
+            <Box
+              sx={{
+                backgroundColor: "white",
+                borderRadius: "5px",
+                width: "480px",
+                height: "480px",
+                maxWidth: "520px",
+                maxHeight: "540px",
+                boxShadow: "0px 0px 10px rgba(100, 111, 203, 0.6)",
+              }}
+            >
+              <Typography
+                variant="h6"
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  paddingTop: "10px",
                 }}
               >
-                {userData.firstName && userData.lastName
-                  ? userData.firstName?.charAt(0) + userData.lastName?.charAt(0)
-                  : ""}
-              </Avatar>
-            )}
-          </div>
-          <ProfileData tag="First name" text={userData.firstName} />
-          <ProfileData tag="Last name" text={userData.lastName} />
-          <ProfileData tag="Username" text={userData.firstName} />
-          <ProfileData tag="Email" text={"test@gmail.com"} isVerified={true} />
-          <ProfileData
-            tag="Phone number"
-            text={"+40741385734"}
-            isVerified={true}
-          />
-        </Box>
-
-        <ProfileCard
-          title="Reduceri Personale"
-          style={{
-            height: "430px",
-            width: "300px",
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "column",
-          }}
+                Contul meu
+              </Typography>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: "20px",
+                }}
+              >
+                {userData && userData.profileImage ? (
+                  <Avatar
+                    alt="User Image"
+                    src={userData.profileImage}
+                    sx={{ width: "80px", height: "80px" }}
+                  />
+                ) : (
+                  <Avatar
+                    sx={{
+                      bgcolor: "#646FCB",
+                      color: "#fff",
+                      fontSize: 36,
+                      width: "80px",
+                      height: "80px",
+                    }}
+                  >
+                    {userData.firstName && userData.lastName
+                      ? userData.firstName?.charAt(0) +
+                        userData.lastName?.charAt(0)
+                      : ""}
+                  </Avatar>
+                )}
+              </div>
+              <ProfileData tag="First name" text={userData.firstName} />
+              <ProfileData tag="Last name" text={userData.lastName} />
+              <ProfileData tag="Username" text={userData.firstName} />
+              <ProfileData
+                tag="Email"
+                text={"test@gmail.com"}
+                isVerified={true}
+              />
+              <ProfileData
+                tag="Phone number"
+                text={"+40741385734"}
+                isVerified={true}
+              />
+            </Box>
+          </Grid>
+          <Grid item>
+            <ProfileCard
+              title="Reduceri Personale"
+              style={{
+                height: "430px",
+                width: "300px",
+                display: "flex",
+                alignItems: "center",
+                flexDirection: "column",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  width: "400px",
+                  height: "40px",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-evenly",
+                  margin: "30px 20px 0px 20px",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  style={{
+                    fontSize: "16px",
+                  }}
+                >
+                  HQTESA
+                </Typography>
+                <Typography
+                  variant="h6"
+                  style={{
+                    fontSize: "14px",
+                    fontStyle: "italic",
+                  }}
+                >
+                  20% orice produs
+                </Typography>
+                <NoHoverIconButton>
+                  <ContentCopyOutlinedIcon style={{ color: "#646FCB" }} />
+                </NoHoverIconButton>
+              </div>
+            </ProfileCard>
+          </Grid>
+          <Grid item>
+            <ProfileCard
+              title="Adresele mele"
+              style={{
+                height: "430px",
+                width: "340px",
+                display: "flex",
+                alignItems: "center",
+                flexDirection: "column",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  width: "400px",
+                  height: "40px",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-around",
+                  margin: "30px 20px 0px 20px",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  style={{
+                    fontSize: "16px",
+                  }}
+                >
+                  Strada Academiei 14, București 010014
+                </Typography>
+                <NoHoverIconButton>
+                  <ContentCopyOutlinedIcon style={{ color: "#646FCB" }} />
+                </NoHoverIconButton>
+              </div>
+            </ProfileCard>
+          </Grid>
+        </Grid>
+        <Grid
+          container
+          spacing={2}
+          justifyContent="space-evenly"
+          marginTop="30px"
         >
-          <div
-            style={{
-              display: "flex",
-              width: "400px",
-              height: "40px",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-evenly",
-              margin: "30px 20px 0px 20px",
-            }}
-          >
-            <Typography
-              variant="h6"
+          <Grid item>
+            <ProfileCard
+              title="Comenzile mele"
               style={{
-                fontSize: "16px",
+                height: "430px",
+                width: "350px",
+                display: "flex",
+                alignItems: "center",
+                flexDirection: "column",
               }}
             >
-              HQTESA
-            </Typography>
-            <Typography
-              variant="h6"
+              <div
+                style={{
+                  display: "flex",
+                  width: "400px",
+                  height: "40px",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-around",
+                  margin: "30px 20px 0px 20px",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  style={{
+                    fontSize: "16px",
+                  }}
+                >
+                  Strada Academiei 14, București 010014
+                </Typography>
+                <NoHoverIconButton>
+                  <OpenInNewOutlinedIcon style={{ color: "#646FCB" }} />
+                </NoHoverIconButton>
+              </div>
+            </ProfileCard>
+          </Grid>
+          <Grid item>
+            <ProfileCard
+              title={"Conversațiie mele"}
               style={{
-                fontSize: "14px",
-                fontStyle: "italic",
+                height: "430px",
+                width: "300px",
+                display: "flex",
+                alignItems: "center",
+                flexDirection: "column",
               }}
             >
-              20% orice produs
-            </Typography>
-            <NoHoverIconButton>
-              <ContentCopyOutlinedIcon style={{ color: "#646FCB" }} />
-            </NoHoverIconButton>
-          </div>
-        </ProfileCard>
-        <ProfileCard
-          title="Adresele mele"
-          style={{
-            height: "430px",
-            width: "340px",
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "column",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              width: "400px",
-              height: "40px",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-around",
-              margin: "30px 20px 0px 20px",
-            }}
-          >
-            <Typography
-              variant="h6"
+              <div
+                style={{
+                  display: "flex",
+                  width: "400px",
+                  height: "40px",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-around",
+                  margin: "30px 20px 0px 20px",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  style={{
+                    fontSize: "16px",
+                  }}
+                >
+                  Bogdan
+                </Typography>
+                <NoHoverIconButton>
+                  <MessageOutlinedIcon style={{ color: "#646FCB" }} />
+                </NoHoverIconButton>
+              </div>
+            </ProfileCard>
+          </Grid>
+          <Grid item>
+            <ProfileCard
+              title={"Review-urile mele"}
               style={{
-                fontSize: "16px",
+                height: "430px",
+                width: "300px",
+                display: "flex",
+                alignItems: "center",
+                flexDirection: "column",
               }}
             >
-              Strada Academiei 14, București 010014
-            </Typography>
-            <NoHoverIconButton>
-              <ContentCopyOutlinedIcon style={{ color: "#646FCB" }} />
-            </NoHoverIconButton>
-          </div>
-        </ProfileCard>
+              <div
+                style={{
+                  display: "flex",
+                  width: "400px",
+                  height: "40px",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-around",
+                  margin: "30px 20px 0px 20px",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  style={{
+                    fontSize: "16px",
+                  }}
+                >
+                  Sistem all in one
+                </Typography>
+                <NoHoverIconButton>
+                  <OpenInNewOutlinedIcon style={{ color: "#646FCB" }} />
+                </NoHoverIconButton>
+              </div>
+            </ProfileCard>
+          </Grid>
+        </Grid>
+        <div style={{ marginBottom: "20px" }} />
       </div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-evenly",
-          alignItems: "center",
-          marginTop: "50px",
-        }}
-      >
-        <ProfileCard
-          title="Comenzile mele"
-          style={{
-            height: "430px",
-            width: "600px",
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "column",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              width: "400px",
-              height: "40px",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-around",
-              margin: "30px 20px 0px 20px",
-            }}
-          >
-            <Typography
-              variant="h6"
-              style={{
-                fontSize: "16px",
-              }}
-            >
-              Strada Academiei 14, București 010014
-            </Typography>
-            <NoHoverIconButton>
-              <OpenInNewOutlinedIcon style={{ color: "#646FCB" }} />
-            </NoHoverIconButton>
-          </div>
-        </ProfileCard>
-        <ProfileCard
-          title={"Conversațiie mele"}
-          style={{
-            height: "430px",
-            width: "600px",
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "column",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              width: "400px",
-              height: "40px",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-around",
-              margin: "30px 20px 0px 20px",
-            }}
-          >
-            <Typography
-              variant="h6"
-              style={{
-                fontSize: "16px",
-              }}
-            >
-              Bogdan
-            </Typography>
-            <NoHoverIconButton>
-              <MessageOutlinedIcon style={{ color: "#646FCB" }} />
-            </NoHoverIconButton>
-          </div>
-        </ProfileCard>
-        <ProfileCard
-          title={"Review-urile mele"}
-          style={{
-            height: "430px",
-            width: "600px",
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "column",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              width: "400px",
-              height: "40px",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-around",
-              margin: "30px 20px 0px 20px",
-            }}
-          >
-            <Typography
-              variant="h6"
-              style={{
-                fontSize: "16px",
-              }}
-            >
-              Sistem all in one
-            </Typography>
-            <NoHoverIconButton>
-              <OpenInNewOutlinedIcon style={{ color: "#646FCB" }} />
-            </NoHoverIconButton>
-          </div>
-        </ProfileCard>
-      </div>
-      <div style={{ marginBottom: "20px" }} />
-    </div>
+    </Grid>
   );
 };
