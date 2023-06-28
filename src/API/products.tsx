@@ -67,6 +67,57 @@ export const addReview = async (props: AddReviewProps) => {
   return response;
 };
 
+export const addQuestion = async (props: AddReviewProps) => {
+  const response = await axios.post(
+    `${ApiUrls.addQuestion}`,
+    {
+      productId: props.productId,
+      comment: props.comment,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
+
+  return response;
+};
+
+interface ApplyShoppingDiscountProps {
+  id?: number;
+  discountCode: string;
+}
+
+export const applyShoppingDiscount = async (
+  props: ApplyShoppingDiscountProps
+) => {
+  const response = await axios.post(
+    `${ApiUrls.applyShoppingDiscount}`,
+    {
+      id: props.id,
+      discountCode: props.discountCode,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
+
+  return response;
+};
+
+export const getDiscount = async (value: string) => {
+  const response = await axios.get(`${ApiUrls.getDiscount}/${value}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+  });
+
+  return response;
+};
+
 // Favorites
 
 export const addFavorites = async (props: FavoriteProps) => {

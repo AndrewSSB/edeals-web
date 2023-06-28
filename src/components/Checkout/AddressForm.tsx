@@ -19,6 +19,8 @@ interface AddressFormProps {
   setLastName: (value: string) => void;
   address: Address | null | undefined;
   setAddress: React.Dispatch<React.SetStateAction<Address>>;
+  saveAddress: boolean;
+  setSaveAddress: (value: boolean) => void;
 }
 
 export const AddressForm = (props: AddressFormProps) => {
@@ -97,6 +99,39 @@ export const AddressForm = (props: AddressFormProps) => {
         <Grid item xs={12} sm={6}>
           <TextField
             required
+            id="Country"
+            name="Țara"
+            label="Țara"
+            value={props.address?.country ?? ""}
+            onChange={(event: any) => {
+              props.setAddress({
+                ...props.address,
+                country: event.target.value,
+              });
+            }}
+            fullWidth
+            autoComplete="shipping address-level2"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            required
+            id="state"
+            name="state"
+            label="Județ"
+            value={props.address?.region ?? ""}
+            onChange={(event: any) => {
+              props.setAddress({
+                ...props.address,
+                region: event.target.value,
+              });
+            }}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            required
             id="city"
             name="Oraș"
             label="Oraș"
@@ -111,42 +146,24 @@ export const AddressForm = (props: AddressFormProps) => {
             autoComplete="shipping address-level2"
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={6}>
           <TextField
-            id="state"
-            name="state"
-            label="Județ"
-            value={props.address?.region ?? ""}
+            required
+            id="zip"
+            name="zip"
+            label="Cod Poștal"
+            value={props.address?.postalCode ?? ""}
             onChange={(event: any) => {
               props.setAddress({
                 ...props.address,
-                region: event.target.value,
+                postalCode: event.target.value,
               });
             }}
             fullWidth
+            autoComplete="shipping postal-code"
           />
         </Grid>
-        <Grid item xs={12}>
-          <Grid container justifyContent="center">
-            <Grid item xs={6}>
-              <TextField
-                required
-                id="zip"
-                name="zip"
-                label="Cod Poștal"
-                value={props.address?.postalCode ?? ""}
-                onChange={(event: any) => {
-                  props.setAddress({
-                    ...props.address,
-                    postalCode: event.target.value,
-                  });
-                }}
-                fullWidth
-                autoComplete="shipping postal-code"
-              />
-            </Grid>
-          </Grid>
-        </Grid>
+
         <Grid item xs={12}>
           <TextField
             id="mentiuni"
@@ -162,18 +179,22 @@ export const AddressForm = (props: AddressFormProps) => {
             fullWidth
           />
         </Grid>
-        <Grid item xs={12}>
-          <FormControlLabel
-            control={
-              <Checkbox
-                style={{ color: "#646FCB" }}
-                name="saveAddress"
-                value="yes"
-              />
-            }
-            label="Salvează adresa pentru următoare comenzi"
-          />
-        </Grid>
+        {localStorage.getItem("accessToken") && (
+          <Grid item xs={12}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  style={{ color: "#646FCB" }}
+                  name="saveAddress"
+                  value="yes"
+                  checked={props.saveAddress}
+                  onChange={() => props.setSaveAddress(!props.saveAddress)}
+                />
+              }
+              label="Salvează adresa pentru următoare comenzi"
+            />
+          </Grid>
+        )}
       </Grid>
     </div>
   );

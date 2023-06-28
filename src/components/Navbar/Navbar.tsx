@@ -134,7 +134,10 @@ export const Navbar = (props: NavBarProps) => {
             cartItemId: idx,
             productId: prod.productId,
             productName: prod.name,
-            quantity: 0,
+            quantity:
+              cartItemsFromLocalStorage?.find(
+                (x) => x.productId == prod.productId
+              )?.quantity ?? 0,
             shoppingSessionId: 0,
             image: prod.images.mainImage,
             productPrice: prod.price.toString(),
@@ -216,7 +219,7 @@ export const Navbar = (props: NavBarProps) => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
 
-      window.location.reload();
+      navigate("/");
     } catch (ex) {
       console.error(ex);
     }

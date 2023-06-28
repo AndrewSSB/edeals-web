@@ -36,8 +36,9 @@ import { Comments } from "./Comments";
 import "./Swiper.css";
 import { Reviews } from "./Reviews";
 import React from "react";
-import { addReview, getProduct } from "../../API/products";
+import { addQuestion, addReview, getProduct } from "../../API/products";
 import { Review } from "../Checkout/Review";
+import { handleCartItems, handleFavorites } from "../Products/ProductCard";
 
 export interface ChatMessage {
   date: string;
@@ -55,13 +56,33 @@ interface CategoryPathProps {
   categories: Category[];
 }
 
+export const calculateAverageRating = (product: Product) => {
+  if (product?.reviews.length === 0) {
+    return 0;
+  }
+
+  const totalRating = product?.reviews.reduce(
+    (sum, review) => sum + review.rating,
+    0
+  );
+  const averageRating = totalRating! / product?.reviews.length;
+  return +averageRating.toFixed(2);
+};
+
 export const ProductDetails = (props: ProductDetailsProps) => {
-  const { userData } = useContext(UserContext);
+  const { userData, isAuthenticated } = useContext(UserContext);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [connection, setConnection] = useState<HubConnection | null>(null);
   const [channelId, setChannelId] = useState<string>("");
   const [product, setProduct] = useState<Product | undefined>();
-  const { products, categories } = useContext(ProductContext);
+  const {
+    products,
+    categories,
+    shoppingSession,
+    setShoppingSession,
+    favorites,
+    setFavorites,
+  } = useContext(ProductContext);
   const { productId } = useParams();
   const [search, setSearch] = useState("");
 
@@ -196,7 +217,6 @@ export const ProductDetails = (props: ProductDetailsProps) => {
         const response = await getProduct({ productId });
 
         const prod = response.data.responseData;
-        prod.comments = [];
         setProduct(prod);
       }
     };
@@ -207,8 +227,6 @@ export const ProductDetails = (props: ProductDetailsProps) => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  const test = [1, 2, 3, 4, 5];
 
   const handleReviewsComments = async (value: string) => {
     if (!ratingValue) {
@@ -259,12 +277,12 @@ export const ProductDetails = (props: ProductDetailsProps) => {
 
   const handleQuestionsComments = async (value: string) => {
     try {
-      // const response = await addReview({
-      //   title: "",
-      //   comment: value,
-      //   productId: productId!,
-      //   rating: ratingValue,
-      // });
+      const response = await addQuestion({
+        title: "",
+        comment: value,
+        productId: productId!,
+        rating: ratingValue,
+      });
 
       setProduct((prevProduct) => {
         if (prevProduct) {
@@ -292,19 +310,6 @@ export const ProductDetails = (props: ProductDetailsProps) => {
         setError("Trebuie sa fii autentificat pentru a putea lăsa o întrebare");
       }
     }
-  };
-
-  const calculateAverageRating = () => {
-    if (product?.reviews.length === 0) {
-      return 0;
-    }
-
-    const totalRating = product?.reviews.reduce(
-      (sum, review) => sum + review.rating,
-      0
-    );
-    const averageRating = totalRating! / product?.reviews.length!;
-    return +averageRating.toFixed(2);
   };
 
   return (
@@ -378,11 +383,28 @@ export const ProductDetails = (props: ProductDetailsProps) => {
               height: "50px",
               fontSize: "20px",
             }}
+            onClick={() =>
+              handleCartItems(
+                1,
+                product!,
+                isAuthenticated,
+                shoppingSession,
+                setShoppingSession
+              )
+            }
           />
           <AutenticationButtons
             buttonText={"Adaugă la favorite"}
             buttonWidth={"60%"}
             style={{ marginTop: "40px", height: "50px", fontSize: "20px" }}
+            onClick={() =>
+              handleFavorites(
+                product!,
+                favorites,
+                setFavorites,
+                isAuthenticated
+              )
+            }
           />
         </Box>
       </div>
@@ -472,12 +494,12 @@ export const ProductDetails = (props: ProductDetailsProps) => {
               }}
             >
               <span style={{ fontSize: "40px" }}>
-                {calculateAverageRating()}
+                {calculateAverageRating(product!)}
               </span>
               <Rating
                 name="product-rating"
                 precision={0.5}
-                value={calculateAverageRating()}
+                value={calculateAverageRating(product!)}
                 readOnly
                 style={{
                   fontSize: "36px",

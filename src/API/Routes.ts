@@ -20,6 +20,11 @@ type apiUrls = {
   messages: string;
   categories: string;
   addReview: string;
+  addQuestion: string;
+  applyShoppingDiscount: string;
+  getDiscount: string;
+  saveAddress: string;
+  getAddress: string;
 };
 
 export const ApiUrls: apiUrls = {
@@ -46,5 +51,12 @@ export const ApiUrls: apiUrls = {
 
   categories: `${localUrl}/catalog/api/category/all`,
 
-  addReview: `${localUrl}/catalog/api/review`,
+  addReview: `${localUrl}/catalog/api/review/review`,
+  addQuestion: `${localUrl}/catalog/api/review/question`,
+
+  applyShoppingDiscount: `${localUrl}/catalog/api/shoppingsession/apply-discount`,
+  getDiscount: `${localUrl}/catalog/api/discount`,
+
+  saveAddress: `${localUrl}/catalog/api/userinfo/save-address`,
+  getAddress: `${localUrl}/catalog/api/userinfo`,
 };

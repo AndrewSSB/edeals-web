@@ -11,9 +11,15 @@ import logo from "../../images/logo.png";
 import { LogoImage } from "../Navbar/NavbarElements";
 import { AutenticationButtons } from "../CustomButtons/CustomButtons";
 import { useNavigate } from "react-router-dom";
-import { useContext, useState } from "react";
-import { ProductContext, ShoppingSession } from "../../context/ProductsContext";
+import { useContext, useEffect, useState } from "react";
+import {
+  ProductContext,
+  ShoppingSession,
+  Transport,
+} from "../../context/ProductsContext";
 import { Address, User, UserContext } from "../../context/UserContext";
+import { Alert, AlertTitle, Slide, Snackbar } from "@mui/material";
+import { getAddress, saveUserAddress } from "../../API/user";
 
 const steps = ["Shipping address", "Review your order"];
 
@@ -23,14 +29,40 @@ export interface CheckoutProps {
 
 export default function Checkout() {
   const [activeStep, setActiveStep] = React.useState(0);
-  const { shoppingSession } = useContext(ProductContext);
-  const { userData, firstName, setFirstName, lastName, setLastName } =
-    useContext(UserContext);
+  const { shoppingSession, transport, setTransport } =
+    useContext(ProductContext);
+  const {
+    userData,
+    setUserData,
+    firstName,
+    setFirstName,
+    lastName,
+    setLastName,
+  } = useContext(UserContext);
   const navigate = useNavigate();
 
   const [address, setAddress] = useState<Address>({});
+  const [error, setError] = useState<string | null>(null);
+  const [saveAddress, setSaveAddress] = useState(false);
 
-  const getStepContent = (step: number, shopping: ShoppingSession) => {
+  const handleCloseSnackbar = () => {
+    setError(null);
+  };
+
+  useEffect(() => {
+    const getTransportDetails = async () => {
+      // call the courier api
+      setTransport({ transportPrice: 33.99 });
+    };
+
+    getTransportDetails();
+  }, []);
+
+  const getStepContent = (
+    step: number,
+    shopping: ShoppingSession,
+    transport: Transport
+  ) => {
     switch (step) {
       case 0:
         return (
@@ -41,6 +73,8 @@ export default function Checkout() {
             setLastName={setLastName}
             firstName={firstName}
             lastName={lastName}
+            saveAddress={saveAddress}
+            setSaveAddress={setSaveAddress}
           />
         );
       case 1:
@@ -50,6 +84,7 @@ export default function Checkout() {
             address={address}
             firstName={firstName}
             lastName={lastName}
+            transport={transport}
           />
         );
       default:
@@ -57,7 +92,45 @@ export default function Checkout() {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    if (!firstName) {
+      setError("Prenumele trebuie completat");
+      return;
+    }
+
+    if (!lastName) {
+      setError("Prenumele trebuie completat");
+      return;
+    }
+
+    if (!address.address) {
+      setError("Adresa trebuie completata");
+      return;
+    }
+
+    if (!address.city) {
+      setError("Orasul trebuie completat");
+      return;
+    }
+
+    if (!address.postalCode) {
+      setError("Tara trebuie completata");
+      return;
+    }
+
+    if (!address.region) {
+      setError("Judetul trebuie completat");
+      return;
+    }
+
+    if (saveAddress) {
+      try {
+        await saveUserAddress(address);
+      } catch (e: any) {
+        console.log(e.response.data);
+      }
+    }
+
     setActiveStep(activeStep + 1);
 
     if (activeStep === steps.length - 1) {
@@ -75,6 +148,24 @@ export default function Checkout() {
   const handleProductDetails = () => {
     navigate(`/payment/${shoppingSession.cartItems[0].shoppingSessionId}`);
   };
+
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      try {
+        const response = await getAddress();
+        const addresses = response.data.responseData;
+
+        userData.addresses = addresses;
+        setUserData(userData);
+
+        setAddress(addresses[0]);
+      } catch {
+        console.error("n-a mers addresses");
+      }
+    };
+
+    fetchAddresses();
+  }, []);
 
   return (
     <div style={{ backgroundColor: "#F7F7F7", minHeight: "100vh" }}>
@@ -112,7 +203,7 @@ export default function Checkout() {
               <div></div>
             ) : (
               <React.Fragment>
-                {getStepContent(activeStep, shoppingSession)}
+                {getStepContent(activeStep, shoppingSession, transport)}
                 <div
                   style={{
                     display: "flex",
@@ -166,6 +257,19 @@ export default function Checkout() {
         </Paper>
         <Copyright style={{ margin: "20px 0px 10px 0px" }} />
       </Container>
+      <Snackbar
+        open={!!error}
+        autoHideDuration={4000}
+        message={error}
+        onClose={handleCloseSnackbar}
+        TransitionComponent={Slide}
+        TransitionProps={{ timeout: 500 }}
+      >
+        <Alert severity="error" onClose={handleCloseSnackbar}>
+          <AlertTitle>Error</AlertTitle>
+          {error}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }

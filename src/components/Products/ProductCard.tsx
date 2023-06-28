@@ -4,6 +4,7 @@ import {
   CartItem,
   Product,
   ProductContext,
+  ShoppingSession,
 } from "../../context/ProductsContext";
 import { CardImage, CardWrapper, ProductDescription } from "./ProductElements";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -17,12 +18,119 @@ import {
   getShoppingSession,
 } from "../../API/products";
 import { useNavigate } from "react-router-dom";
-import { ProductDetails } from "../ProductDetails/ProductDetails";
 import { UserContext } from "../../context/UserContext";
-import { SetProductsToLocalStorage } from "../../hooks/SetItemsToLocalStorage";
+import {
+  GetProductsFromLocalStorage,
+  SetProductsToLocalStorage,
+} from "../../hooks/SetItemsToLocalStorage";
+import { calculateAverageRating } from "../ProductDetails/ProductDetails";
 
 type ProductCardProps = {
   product: Product;
+};
+
+export const handleCartItems = async (
+  _quantity: number,
+  product: Product,
+  isAuthenticated: boolean,
+  shoppingSession: ShoppingSession,
+  setShoppingSession: (value: ShoppingSession) => void
+) => {
+  if (isAuthenticated) {
+    try {
+      await addCartItems({ quantity: _quantity, productId: product.productId });
+
+      const response = await getShoppingSession(1000);
+
+      const responseData = response.data.responseData;
+
+      setShoppingSession(responseData);
+    } catch (error) {
+      console.error("Failed to add / fetch cart items");
+    }
+  } else {
+    shoppingSession.total = +shoppingSession.cartItems
+      .reduce((accumulator, item) => {
+        return accumulator + +item.productPrice * item.quantity;
+      }, 0)
+      .toFixed(2);
+
+    setShoppingSession(shoppingSession);
+
+    const cartItem: CartItem = {
+      productId: product.productId,
+      productName: product.name,
+      productPrice: product.price.toString(),
+      image: product.images.mainImage,
+      description: product.shortDescription,
+      quantity: _quantity,
+      shoppingSessionId: 0,
+      cartItemId: shoppingSession.cartItems.length,
+    };
+
+    const total = +(
+      shoppingSession.cartItems.reduce((accumulator, item) => {
+        return accumulator + +item.productPrice * item.quantity;
+      }, 0) +
+      +cartItem.productPrice * cartItem.quantity
+    ).toFixed(2);
+
+    var itemIndex = shoppingSession.cartItems.findIndex(
+      (prod) => prod.productId === product.productId
+    );
+
+    if (itemIndex != -1) {
+      shoppingSession.cartItems[itemIndex].quantity += 1;
+      shoppingSession.total +=
+        +shoppingSession.cartItems[itemIndex].productPrice;
+      setShoppingSession(shoppingSession);
+    } else {
+      setShoppingSession({
+        shoppingSessionId: 0,
+        cartItems: [...shoppingSession.cartItems, cartItem],
+        total: total,
+      });
+    }
+
+    SetProductsToLocalStorage({
+      keyName: "cartItems",
+      product: product,
+      addOnlyOnce: false,
+    });
+  }
+};
+
+export const handleFavorites = async (
+  product: Product,
+  favorites: Product[],
+  setFavorites: (value: Product[]) => void,
+  isAuthenticated: boolean
+) => {
+  const favorite = favorites.find((prd) => prd.productId === product.productId);
+  if (isAuthenticated) {
+    try {
+      if (!favorite) {
+        await addFavorites({ productId: product.productId });
+      }
+
+      const response = await getFavorites();
+      const responseData = response.data.responseData;
+
+      setFavorites(responseData);
+    } catch (error: any) {
+      console.error("Failed to add / fetch favorite products");
+    }
+  } else {
+    if (!favorite) {
+      setFavorites([...favorites, product]);
+    }
+
+    SetProductsToLocalStorage({
+      keyName: "favorite",
+      product: product,
+      addOnlyOnce: true,
+    });
+  }
 };
 
 export const ProductCard = ({ product }: ProductCardProps) => {
@@ -32,91 +140,6 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   const { isAuthenticated } = useContext(UserContext);
 
   const navigate = useNavigate();
-
-  const handleFavorites = async (value: string) => {
-    const favorite = favorites.find((product) => product.productId === value);
-    if (isAuthenticated) {
-      try {
-        if (!favorite) {
-          await addFavorites({ productId: value });
-        }
-
-        const response = await getFavorites();
-        const responseData = response.data.responseData;
-
-        setFavorites(responseData);
-      } catch (error: any) {
-        console.error("Failed to add / fetch favorite products");
-      }
-    } else {
-      if (!favorite) {
-        setFavorites([...favorites, product]);
-      }
-
-      SetProductsToLocalStorage({
-        keyName: "favorite",
-        product: product,
-        addOnlyOnce: true,
-      });
-    }
-  };
-
-  const handleCartItems = async (_quantity: number, _productId: string) => {
-    if (isAuthenticated) {
-      try {
-        await addCartItems({ quantity: _quantity, productId: _productId });
-
-        const response = await getShoppingSession(1000);
-
-        const responseData = response.data.responseData;
-
-        setShoppingSession(responseData);
-      } catch (error) {
-        console.error("Failed to add / fetch cart items");
-      }
-    } else {
-      const cartItem: CartItem = {
-        productId: product.productId,
-        productName: product.name,
-        productPrice: product.price.toString(),
-        image: product.images.mainImage,
-        description: product.shortDescription,
-        quantity: _quantity,
-        shoppingSessionId: 0,
-        cartItemId: shoppingSession.cartItems.length,
-      };
-
-      const total = +(
-        shoppingSession.cartItems.reduce((accumulator, item) => {
-          return accumulator + +item.productPrice * item.quantity;
-        }, 0) +
-        +cartItem.productPrice * cartItem.quantity
-      ).toFixed(2);
-
-      var itemIndex = shoppingSession.cartItems.findIndex(
-        (prod) => prod.productId === product.productId
-      );
-
-      if (itemIndex != -1) {
-        shoppingSession.cartItems[itemIndex].quantity += 1;
-        shoppingSession.total +=
-          +shoppingSession.cartItems[itemIndex].productPrice;
-        setShoppingSession(shoppingSession);
-      } else {
-        setShoppingSession({
-          shoppingSessionId: 1,
-          cartItems: [...shoppingSession.cartItems, cartItem],
-          total: total,
-        });
-      }
-
-      SetProductsToLocalStorage({
-        keyName: "cartItems",
-        product: product,
-        addOnlyOnce: false,
-      });
-    }
-  };
 
   const handleProductDetails = (productId: string) => {
     navigate(`/product/${productId}`);
@@ -136,7 +159,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         }}
       >
         <CardWrapper
-          style={{ cursor: "pointer" }}
+          style={{ cursor: "pointer", height: "280px" }}
           onClick={() => handleProductDetails(product.productId)}
         >
           <CardImage>
@@ -158,8 +181,8 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             </ProductDescription>
             <Rating
               name="product-rating"
-              value={Math.random() * (5 - 1) + 1}
-              precision={0.5}
+              value={calculateAverageRating(product)}
+              precision={0.2}
               readOnly
               style={{ fontSize: "18px", marginTop: "10px" }}
             />
@@ -187,11 +210,23 @@ export const ProductCard = ({ product }: ProductCardProps) => {
               {product.price} Lei
             </span>
           </div>
-          <NoHoverIconButton onClick={() => handleFavorites(product.productId)}>
+          <NoHoverIconButton
+            onClick={() =>
+              handleFavorites(product, favorites, setFavorites, isAuthenticated)
+            }
+          >
             <FavoriteIcon sx={{ color: "#646FCB" }} />
           </NoHoverIconButton>
           <NoHoverIconButton
-            onClick={() => handleCartItems(1, product.productId)}
+            onClick={() =>
+              handleCartItems(
+                1,
+                product,
+                isAuthenticated,
+                shoppingSession,
+                setShoppingSession
+              )
+            }
           >
             <ShoppingCartIcon sx={{ color: "#646FCB" }} />
           </NoHoverIconButton>

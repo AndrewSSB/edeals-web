@@ -1,15 +1,20 @@
 import {
+  Alert,
+  AlertTitle,
   Avatar,
   Box,
   Card,
   CardContent,
   CardMedia,
   Grid,
+  Slide,
+  Snackbar,
   Typography,
 } from "@mui/material";
 import { Navbar } from "../Navbar/Navbar";
 import { CardImage, ProductDescription } from "../Products/ProductElements";
 import {
+  Discount,
   Product,
   ProductContext,
   ShoppingSession,
@@ -23,6 +28,13 @@ import { AutenticationButtons } from "../CustomButtons/CustomButtons";
 import { UserContext } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import Checkout from "../Checkout/Checkout";
+import { applyShoppingDiscount, getDiscount } from "../../API/products";
+import { handleCartItems, handleFavorites } from "../Products/ProductCard";
+import { removeCartItem } from "../Products/LittleProductCard";
+import {
+  DeleteProductsFromLocalStorage,
+  SetProductsToLocalStorage,
+} from "../../hooks/SetItemsToLocalStorage";
 
 interface ProductProfileProps {
   basket?: string;
@@ -34,6 +46,7 @@ interface ProductProfileProps {
 interface AllProducts {
   quantity: number;
   product?: Product;
+  cartItemId: number | string;
 }
 
 interface custom {
@@ -62,7 +75,10 @@ interface ProductCardProps {
   description: string;
   quantity: number;
   price: number;
-  onClick?: () => void;
+  onClick?: (substract: boolean, product: Product) => void;
+  removeElements?: (product: Product) => void;
+  moveElements?: (product: Product) => void;
+  product?: Product;
   isInBasket: boolean;
 }
 
@@ -73,6 +89,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
   price,
   isInBasket,
   onClick,
+  removeElements,
+  moveElements,
+  product,
 }) => {
   return (
     <>
@@ -140,7 +159,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               }}
             >
               {isInBasket && (
-                <NoHoverIconButton>
+                <NoHoverIconButton onClick={() => onClick!(false, product!)}>
                   <RemoveIcon sx={{ color: "black" }} />
                 </NoHoverIconButton>
               )}
@@ -154,7 +173,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
               {isInBasket && (
                 <div style={{ marginRight: "-12px" }}>
-                  <NoHoverIconButton>
+                  <NoHoverIconButton onClick={() => onClick!(true, product!)}>
                     <AddIcon sx={{ color: "black" }} />
                   </NoHoverIconButton>
                 </div>
@@ -167,12 +186,19 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 justifyContent: "flex-end",
               }}
             >
-              <Typography
-                variant="body1"
-                sx={{ marginTop: 1, marginBottom: "10px", fontSize: "14px" }}
-              >
-                Șterge
-              </Typography>
+              <div onClick={() => removeElements!(product!)}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    marginTop: 1,
+                    marginBottom: "10px",
+                    fontSize: "14px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Șterge
+                </Typography>
+              </div>
             </div>
 
             <div
@@ -181,21 +207,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 justifyContent: "flex-end",
               }}
             >
-              <Typography
-                variant="body1"
-                sx={{ marginTop: 1, fontSize: "14px" }}
-              >
-                Mută în {!isInBasket ? "coș" : "favorite"}
-              </Typography>
+              <div onClick={() => moveElements!(product!)}>
+                <Typography
+                  variant="body1"
+                  sx={{ marginTop: 1, fontSize: "14px", cursor: "pointer" }}
+                >
+                  Mută în {!isInBasket ? "coș" : "favorite"}
+                </Typography>
+              </div>
             </div>
-            {/* <Stack direction="row" spacing={1} marginTop={1}>
-              <Button variant="outlined" color="error">
-                Delete
-              </Button>
-              <Button variant="outlined" color="primary">
-                Move to Favorites
-              </Button>
-            </Stack> */}
           </CardContent>
         </div>
       </Card>
@@ -213,7 +233,7 @@ const manageProducts = (
 
   const productsWithQuantity: AllProducts[] = shoppingSession.cartItems.map(
     (cartItem) => {
-      const { productId, quantity } = cartItem;
+      const { productId, quantity, cartItemId } = cartItem;
 
       const product = products.find(
         (product) => product.productId === productId
@@ -222,6 +242,7 @@ const manageProducts = (
       return {
         quantity,
         product,
+        cartItemId,
       };
     }
   );
@@ -260,38 +281,146 @@ export const lineStyle = {
 
 export const ProductProfile = (props: ProductProfileProps) => {
   const isAuthenticated = localStorage.getItem("accessToken") ? true : false;
-  const { shoppingSession, products, favorites } = useContext(ProductContext);
-  const [discount, setDiscount] = useState<string>("");
-  const [discountPercent, setDiscountPercent] = useState<number>(0);
-  const [transportPrice, setTransportPrice] = useState<number>(0);
-  const [total, setTotal] = useState<number>(0);
+  const {
+    shoppingSession,
+    setShoppingSession,
+    shoppingDiscount,
+    setShoppingDiscount,
+    products,
+    favorites,
+    setFavorites,
+    transport,
+    setTransport,
+  } = useContext(ProductContext);
+  const [discountCode, setDiscountCode] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
   const { userData } = useContext(UserContext);
+  const handleCloseSnackbar = () => {
+    setError(null);
+  };
 
-  const allProducts = manageProducts(products, shoppingSession);
+  const [allProducts, setAllProducts] = useState<AllProducts[] | undefined>([]);
 
   const navigator = useNavigate();
 
   useEffect(() => {
-    setTransportPrice(
-      36.99 //shoppingSession ? parseFloat((shoppingSession.total * 0.1).toFixed(2)) : 0
+    const getTransportDetails = async () => {
+      // call the courier api
+      setTransport({ transportPrice: 33.99 });
+    };
+
+    getTransportDetails();
+  }, []);
+
+  const handleDiscount = async (discountCode?: string) => {
+    if (!discountCode) {
+      setError("Adauga un cod pentru a obtine o reducere");
+      return;
+    }
+    // Call the BE for the discount percentage
+    if (shoppingSession.discountPercent) {
+      setError("Ai aplicat deja un cod de reducere");
+      return;
+    }
+    try {
+      const response = await getDiscount(discountCode!);
+      const discount = response.data.responseData;
+
+      setShoppingDiscount(discount);
+
+      const totalEffect = shoppingSession.total + transport.transportPrice;
+      const afterDiscount =
+        totalEffect - totalEffect * (discount.discountPercent / 100);
+
+      shoppingSession.totalWithDiscount = +afterDiscount.toFixed(2);
+      shoppingSession.discountPercent = discount.discountPercent;
+      setShoppingSession(shoppingSession);
+    } catch (e: any) {
+      setError(e.response.data.errors[0].description);
+      return;
+    }
+
+    if (isAuthenticated) {
+      try {
+        const response = await applyShoppingDiscount({
+          discountCode: discountCode!,
+        });
+      } catch (e: any) {
+        setError(e.response.data.errors[0].description);
+        return;
+      }
+    }
+  };
+
+  const alterProductQuantity = async (substract: boolean, product: Product) => {
+    if (substract) {
+      await handleCartItems(
+        1,
+        product,
+        isAuthenticated,
+        shoppingSession,
+        setShoppingSession
+      );
+    } else {
+      if (isAuthenticated) {
+      } else {
+        // SetProductsToLocalStorage({
+        //   keyName: "cartItems",
+        //   product: product,
+        //   addOnlyOnce: false,
+        // });
+      }
+    }
+    setAllProducts(manageProducts(products, shoppingSession));
+  };
+
+  const removeElements = async (product: Product) => {
+    await removeCartItem(
+      !props.isInbasketPage!,
+      product,
+      shoppingSession.cartItems.find((x) => x.productId === product.productId)
+        ?.cartItemId!,
+      isAuthenticated,
+      shoppingSession,
+      setShoppingSession,
+      favorites,
+      setFavorites
     );
-  }, [shoppingSession]);
+
+    console.log(favorites);
+  };
+
+  const moveToFavorites = async (product: Product) => {
+    await removeElements(product);
+
+    await handleFavorites(product, favorites, setFavorites, isAuthenticated);
+  };
+
+  const moveToBasket = async (product: Product) => {
+    console.log("test");
+    await removeElements(product);
+
+    await handleCartItems(
+      1,
+      product,
+      isAuthenticated,
+      shoppingSession,
+      setShoppingSession
+    );
+  };
 
   useEffect(() => {
-    const totalEffect = shoppingSession.total + transportPrice;
-    const afterDiscount = totalEffect - totalEffect * (discountPercent / 100);
-    setTotal(parseFloat(afterDiscount.toFixed(2)));
-  }, [discountPercent, shoppingSession]);
+    setAllProducts(manageProducts(products, shoppingSession));
+  }, [products, shoppingSession]);
 
-  const handleDiscount = (discountCode: string) => {
-    // Call the BE for the discount percentage
-    setDiscountPercent(10);
-
-    // setTotal((prevTotal) => {
-    //   const afterDiscount = prevTotal - prevTotal * (discountPercent / 100);
-    //   return afterDiscount;
-    // });
-  };
+  useEffect(() => {
+    if (shoppingSession.cartItems.length === 0 && !props.isInbasketPage) {
+      navigator("/");
+    }
+    if (favorites.length === 0 && !props.isInFavoritePage) {
+      navigator("/");
+    }
+  }, [products, shoppingSession, favorites]);
 
   return (
     <Box
@@ -363,13 +492,17 @@ export const ProductProfile = (props: ProductProfileProps) => {
                   {userData.firstName && userData.lastName
                     ? userData.firstName?.charAt(0) +
                       userData.lastName?.charAt(0)
-                    : ""}
+                    : "A"}
                 </Avatar>
               )}
             </div>
             <div
               style={{ height: "25px" }}
-              onClick={() => navigator("/profile")}
+              onClick={() => {
+                if (isAuthenticated) {
+                  navigator("/profile");
+                }
+              }}
             >
               <Typography
                 variant="h6"
@@ -378,7 +511,9 @@ export const ProductProfile = (props: ProductProfileProps) => {
                   cursor: "auto",
                 })}
               >
-                {userData.firstName + " " + userData.lastName}
+                {userData.firstName && userData.lastName
+                  ? userData.firstName + " " + userData.lastName
+                  : "Anonymous"}
               </Typography>
             </div>
             <div style={lineStyle} />
@@ -459,6 +594,10 @@ export const ProductProfile = (props: ProductProfileProps) => {
                     quantity={product.quantity}
                     price={product?.product ? product.product.price : 0}
                     isInBasket={true}
+                    product={product.product}
+                    onClick={alterProductQuantity}
+                    removeElements={removeElements}
+                    moveElements={moveToFavorites}
                   />
                 </div>
               ))
@@ -470,6 +609,9 @@ export const ProductProfile = (props: ProductProfileProps) => {
                     quantity={1}
                     price={product ? product.price : 0}
                     isInBasket={false}
+                    product={product}
+                    removeElements={removeElements}
+                    moveElements={moveToBasket}
                   />
                 </div>
               ))}
@@ -497,13 +639,13 @@ export const ProductProfile = (props: ProductProfileProps) => {
               variant="h6"
               style={{ margin: "10px 0 0px 20px", fontSize: "15px" }}
             >
-              Cost total produse: {shoppingSession.total} lei
+              Cost total produse: {shoppingSession.total.toFixed(2)} lei
             </Typography>
             <Typography
               variant="h6"
               style={{ margin: "0px 0 20px 20px", fontSize: "15px" }}
             >
-              Cost total transport: {transportPrice} lei
+              Cost total transport: {transport.transportPrice} lei
             </Typography>
 
             <Typography
@@ -511,16 +653,28 @@ export const ProductProfile = (props: ProductProfileProps) => {
               style={{ margin: "40px 0px 0px 20px", fontWeight: "bold" }}
             >
               TOTAL:{" "}
-              {parseFloat((shoppingSession.total + transportPrice).toFixed(2))}{" "}
+              {parseFloat(
+                (shoppingSession.total + transport.transportPrice).toFixed(2)
+              )}{" "}
               lei
             </Typography>
             <div style={{ height: "25px" }}>
-              {discountPercent > 0 && (
+              {(shoppingDiscount.discountPercent > 0 ||
+                shoppingSession.discountPercent) && (
                 <Typography
                   variant="h6"
                   style={{ margin: "0px 0px 0px 20px", fontSize: "15px" }}
                 >
-                  Total cu reducere: {total} lei
+                  Total cu reducere:{" "}
+                  {
+                    +(
+                      shoppingSession.total +
+                      transport.transportPrice -
+                      (shoppingSession.total + transport.transportPrice) *
+                        (shoppingSession.discountPercent! / 100)
+                    ).toFixed(2)
+                  }{" "}
+                  lei
                 </Typography>
               )}
             </div>
@@ -528,13 +682,13 @@ export const ProductProfile = (props: ProductProfileProps) => {
               <input
                 id="discount"
                 type="text"
-                value={discount}
+                value={discountCode}
                 placeholder="Aplică discount"
-                onChange={(e) => setDiscount(e.target.value)}
+                onChange={(e) => setDiscountCode(e.target.value)}
                 style={{ marginTop: "60px" }}
               />
               <button
-                onClick={() => handleDiscount(discount)}
+                onClick={() => handleDiscount(discountCode)}
                 id="discountButton"
                 style={{ marginLeft: "15px" }}
               >
@@ -547,7 +701,8 @@ export const ProductProfile = (props: ProductProfileProps) => {
                 margin: "10px 20px",
               }}
             >
-              {discountPercent > 0 && (
+              {(shoppingDiscount.discountPercent > 0 ||
+                shoppingSession.discountPercent) && (
                 <Typography
                   variant="h6"
                   style={{
@@ -555,7 +710,11 @@ export const ProductProfile = (props: ProductProfileProps) => {
                     fontStyle: "italic",
                   }}
                 >
-                  Ai aplicat o reducere de {discountPercent.toString()}%
+                  Ai aplicat o reducere de{" "}
+                  {shoppingDiscount.discountPercent > 0
+                    ? shoppingDiscount.discountPercent
+                    : shoppingSession.discountPercent}
+                  %
                 </Typography>
               )}
             </div>
@@ -569,6 +728,19 @@ export const ProductProfile = (props: ProductProfileProps) => {
           </Box>
         )}
       </div>
+      <Snackbar
+        open={!!error}
+        autoHideDuration={4000}
+        message={error}
+        onClose={handleCloseSnackbar}
+        TransitionComponent={Slide}
+        TransitionProps={{ timeout: 500 }}
+      >
+        <Alert severity="error" onClose={handleCloseSnackbar}>
+          <AlertTitle>Error</AlertTitle>
+          {error}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

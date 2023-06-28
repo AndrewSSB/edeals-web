@@ -4,12 +4,13 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Grid from "@mui/material/Grid";
-import { ShoppingSession } from "../../context/ProductsContext";
+import { ShoppingSession, Transport } from "../../context/ProductsContext";
 import "../ProductDetails/Swiper.css";
 import { Address } from "../../context/UserContext";
 
 interface ReviewProps {
   shoppingSession: ShoppingSession;
+  transport: Transport;
   address: Address;
   firstName: string | null;
   lastName: string | null;
@@ -17,23 +18,22 @@ interface ReviewProps {
 
 export const DisplayAddress = (props: ReviewProps) => {
   let niceAddress = props.address.address ?? "";
-
   if (
     props.address.addressAditionally !== "" &&
     props.address.addressAditionally
   ) {
     niceAddress = niceAddress + ", " + props.address.addressAditionally;
   }
-  if (props.address?.country !== "" && props.address.addressAditionally) {
+  if (props.address?.country !== "" && props.address.country) {
     niceAddress = niceAddress + ", " + props.address.country;
   }
-  if (props.address?.region !== "" && props.address.addressAditionally) {
+  if (props.address?.region !== "" && props.address.region) {
     niceAddress = niceAddress + ", " + props.address.region;
   }
-  if (props.address?.city !== "" && props.address.addressAditionally) {
+  if (props.address?.city !== "" && props.address.city) {
     niceAddress = niceAddress + ", " + props.address.city;
   }
-  if (props.address?.postalCode !== "" && props.address.addressAditionally) {
+  if (props.address?.postalCode !== "" && props.address.postalCode) {
     niceAddress = niceAddress + ", " + props.address.postalCode;
   }
   return <Typography gutterBottom>{niceAddress}</Typography>;
@@ -82,15 +82,44 @@ export const Review = (props: ReviewProps) => {
         <ListItem sx={{ py: 1, px: 0 }}>
           <ListItemText style={{ marginLeft: "10px" }} primary="Transport" />
           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-            36.67 lei
+            {props.transport.transportPrice} lei
           </Typography>
         </ListItem>
         <ListItem sx={{ py: 0, px: 0 }}>
           <ListItemText style={{ marginLeft: "10px" }} primary="Total" />
           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-            3186.66 lei
+            {props.shoppingSession.total + props.transport.transportPrice} lei
           </Typography>
         </ListItem>
+        {props.shoppingSession.totalWithDiscount && (
+          <div>
+            <div
+              style={{ margin: "10px 0px 10px 0px" }}
+              className="gray-line"
+            />
+            <ListItem sx={{ py: 0, px: 0 }}>
+              <ListItemText
+                style={{ marginLeft: "10px", color: "gray" }}
+                secondary="Reducere"
+              />
+              <Typography
+                variant="subtitle2"
+                sx={{ fontWeight: 100, color: "gray" }}
+              >
+                {props.shoppingSession.discountPercent}%
+              </Typography>
+            </ListItem>
+            <ListItem sx={{ py: 0, px: 0 }}>
+              <ListItemText
+                style={{ marginLeft: "10px" }}
+                primary="Total cu reducere"
+              />
+              <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                {props.shoppingSession.totalWithDiscount} lei
+              </Typography>
+            </ListItem>
+          </div>
+        )}
       </List>
       <div style={{ margin: "10px 0px 10px 0px" }} className="gray-line" />
       <Grid container spacing={1} marginLeft={"2px"}>
@@ -106,6 +135,7 @@ export const Review = (props: ReviewProps) => {
             address={props.address}
             firstName={null}
             lastName={null}
+            transport={props.transport}
           />
         </Grid>
       </Grid>

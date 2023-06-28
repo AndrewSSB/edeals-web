@@ -60,10 +60,12 @@ export interface Product {
     name: string;
   };
   discounts: {
+    discountId: number;
     discountCode: string;
     discountName: string;
     description: string;
     discountPercent: number;
+    active: boolean;
   }[];
   reviews: Review[];
   comments: Comment[];
@@ -84,6 +86,17 @@ export interface ShoppingSession {
   shoppingSessionId: number;
   total: number;
   cartItems: CartItem[];
+  totalWithDiscount?: number;
+  discountPercent?: number;
+}
+
+export interface Discount {
+  discountId: number;
+  discountCode: string;
+  discountName: string;
+  description: string;
+  discountPercent: number;
+  active: boolean;
 }
 
 export interface Category {
@@ -93,6 +106,10 @@ export interface Category {
   parentCategoryId: number | null;
   parentCategory: Category | null;
   subCategories: Category[] | null;
+}
+
+export interface Transport {
+  transportPrice: number;
 }
 
 type ProductContextType = {
@@ -110,6 +127,10 @@ type ProductContextType = {
   setShoppingSession: (value: ShoppingSession) => void;
   categories: Category[];
   setCategories: (value: Category[]) => void;
+  shoppingDiscount: Discount;
+  setShoppingDiscount: (value: Discount) => void;
+  transport: Transport;
+  setTransport: (value: Transport) => void;
 };
 
 export const ProductContext = createContext<ProductContextType>(
@@ -128,6 +149,16 @@ export const ProductContextProvider = ({ children }: ProductContextProps) => {
     total: 0,
   });
   const [categories, setCategories] = useState<Category[]>([]);
+  const [shoppingDiscount, setShoppingDiscount] = useState<Discount>({
+    discountId: 0,
+    discountCode: "",
+    discountName: "",
+    description: "",
+    active: false,
+    discountPercent: 0,
+  });
+
+  const [transport, setTransport] = useState<Transport>({ transportPrice: 0 });
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -184,7 +215,10 @@ export const ProductContextProvider = ({ children }: ProductContextProps) => {
               cartItemId: idx,
               productId: prod.productId,
               productName: prod.name,
-              quantity: 0,
+              quantity:
+                cartItemsFromLocalStorage?.find(
+                  (x) => x.productId == prod.productId
+                )?.quantity ?? 0,
               shoppingSessionId: 0,
               image: prod.images.mainImage,
               productPrice: prod.price.toString(),
@@ -241,6 +275,10 @@ export const ProductContextProvider = ({ children }: ProductContextProps) => {
         setShoppingSession,
         categories,
         setCategories,
+        shoppingDiscount,
+        setShoppingDiscount,
+        transport,
+        setTransport,
       }}
     >
       {children}
