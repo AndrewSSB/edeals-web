@@ -19,7 +19,7 @@ import {
   sendLeaveChannel,
   sendJoinChannel,
 } from "../Chat/SignalR";
-import { userInfo } from "os";
+import "../UserProfile/UserProfile.css";
 
 interface SubNavBarProps {
   onClick: (value: number) => void;
@@ -79,7 +79,12 @@ export const SubNavBar = (props: SubNavBarProps) => {
       try {
         const response = await getUsers(null);
 
-        setUsersInfo(response.data.responseData);
+        const users = response.data.responseData;
+
+        const multipliedUsers = users.flatMap((user: UserInfo) =>
+          Array.from({ length: 10 }, () => user)
+        );
+        setUsersInfo(multipliedUsers);
       } catch (e) {
         console.error(e);
       }
@@ -206,17 +211,22 @@ export const SubNavBar = (props: SubNavBarProps) => {
       )}
       {focus && localStorage.getItem("accessToken") && usersInfo.length > 0 && (
         <div
+          className="profile-card"
           onMouseLeave={() => setFocus(false)}
           style={{
             position: "absolute",
             top: "100%",
             right: "18px",
             left: "auto",
-            width: "250px",
+            width: "260px",
+            height: "300px",
             backgroundColor: "#F7F7F7",
             padding: "5px 10px",
             boxShadow: "0px 0px 4px rgba(100, 111, 203, 0.6)",
             zIndex: 1,
+            overflow: "auto",
+            scrollbarWidth: "thin",
+            scrollbarColor: "#646FCB transparent",
           }}
         >
           {usersInfo.map((item, idx) => {
