@@ -1,10 +1,11 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { getAddress, getUser } from "../API/user";
 import {
   connectToHub,
   sendJoinNotificationChannel,
 } from "../components/Chat/SignalR";
 import * as signalR from "@microsoft/signalr";
+import { ChatContext } from "./ChatContext";
 
 type UserContextProps = {
   children: React.ReactNode;
@@ -44,6 +45,7 @@ export interface Notification {
   sender: string;
   receiver: string;
   type: string;
+  channelId: string;
 }
 
 type UserContextType = {
@@ -75,6 +77,8 @@ type UserContextType = {
   setOrder: (value: Order) => void;
   notification: Notification[];
   setNotification: (value: Notification[]) => void;
+  channelId: string;
+  setChannelId: (value: string) => void;
 };
 
 export const UserContext = createContext<UserContextType>(
@@ -116,41 +120,9 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
   );
   const [order, setOrder] = useState<Order>({ orderId: 0 });
   const [notification, setNotification] = useState<Notification[]>([]);
+  const [channelId, setChannelId] = useState<string>("");
 
-  // // User Details
-  // useEffect(() => {
-  //   const isAuthenticated = localStorage.getItem("accessToken") ? true : false;
-  //   setIsAuthenticated(isAuthenticated);
-  //   const fetchUserDetails = async () => {
-  //     if (isAuthenticated) {
-  //       try {
-  //         const response = await getUser();
-
-  //         const userDetails = response.data.responseData;
-
-  //         setUserData({
-  //           firstName: userDetails.firstName,
-  //           lastName: userDetails.lastName,
-  //           userName: userDetails.userName,
-  //           email: userDetails.email,
-  //           isEmailVerified: userDetails.isEmailVerified,
-  //           phoneNumber: userDetails.phoneNumber,
-  //           isPhoneNumberVerified: userDetails.isPhoneNumberVerified,
-  //           profileImage: "",
-  //           addresses: userDetails.addresses,
-  //         });
-
-  //         setFirstName(userDetails.firstName);
-  //         setLastName(userDetails.lastName);
-  //       } catch (error: any) {
-  //         localStorage.removeItem("accessToken");
-  //         localStorage.removeItem("refreshToken");
-  //         console.error("Failed to fetch user details:", error);
-  //       }
-  //     }
-  //   };
-  //   fetchUserDetails();
-  // }, []);
+  const { isChatOpen } = useContext(ChatContext);
 
   useEffect(() => {
     const getConnection = async () => {
@@ -167,12 +139,13 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
     const joinNotificationChannel = async () => {
       try {
         await sendJoinNotificationChannel(connection);
+        console.log("Conectat la generic notifications");
       } catch (e) {
         console.error(e);
       }
     };
 
-    setTimeout(joinNotificationChannel, 2000);
+    setTimeout(joinNotificationChannel, 5000);
   }, [connection]);
 
   useEffect(() => {
@@ -180,40 +153,48 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
       if (
         connection &&
         connection.state === signalR.HubConnectionState.Connected &&
-        isAuthenticated
+        isAuthenticated &&
+        !isChatOpen
       ) {
         console.log("mergi ma ?");
-        connection.on("ReceiveNotification", (sender, receiver, type) => {
-          console.log(sender, receiver, type);
-          setNotification((prev) => {
-            const isDuplicate = prev.some(
-              (item) =>
-                item.sender === sender &&
-                item.receiver === receiver &&
-                item.type === type
-            );
+        connection.on(
+          "ReceiveNotification",
+          (sender, receiver, type, copyChannelId) => {
+            setNotification((prev) => {
+              const isDuplicate = prev.some(
+                (item) =>
+                  item.sender === sender &&
+                  item.receiver === receiver &&
+                  item.type === type
+              );
 
-            if (isDuplicate) {
-              return prev;
-            } else {
-              return [
-                ...prev,
-                { sender: sender, receiver: receiver, type: type },
-              ];
-            }
-          });
-        });
+              if (isDuplicate) {
+                return prev;
+              } else {
+                return [
+                  ...prev,
+                  {
+                    sender: sender,
+                    receiver: receiver,
+                    type: type,
+                    channelId: copyChannelId,
+                  },
+                ];
+              }
+            });
+          }
+        );
 
         return () => {
           connection!.off("ReceiveNotification");
         };
       } else {
-        console.error("No connection to chatHub yet!");
+        console.error("Nu esti autentificat boss");
       }
     };
 
-    setTimeout(receiveNotifications, 2000);
-  }, [connection]);
+    setTimeout(receiveNotifications, 5000);
+  }, [isAuthenticated]);
 
   return (
     <UserContext.Provider
@@ -246,6 +227,8 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
         setOrder,
         notification,
         setNotification,
+        channelId,
+        setChannelId,
       }}
     >
       {children}

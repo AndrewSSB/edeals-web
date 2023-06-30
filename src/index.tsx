@@ -16,6 +16,7 @@ import { UserProfile } from "./components/UserProfile/UserProfile";
 import { AddressForm } from "./components/Checkout/AddressForm";
 import Checkout from "./components/Checkout/Checkout";
 import { useContext, useEffect } from "react";
+import { ChatContext, ChatContextProvider } from "./context/ChatContext";
 
 const App = () => {
   return (
@@ -55,7 +56,9 @@ const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
-  <UserContextProvider>
-    <App />
-  </UserContextProvider>
+  <ChatContextProvider>
+    <UserContextProvider>
+      <App />
+    </UserContextProvider>
+  </ChatContextProvider>
 );

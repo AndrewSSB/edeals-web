@@ -2,19 +2,20 @@ import React, {
   useState,
   useEffect,
   useRef,
-  RefObject,
   CSSProperties,
+  useContext,
 } from "react";
 import { NoHoverIconButton } from "../Navbar/NavbarElements";
-import { Box, Card, Dialog, Typography } from "@mui/material";
+import { Box, Card, Typography } from "@mui/material";
 import RemoveIcon from "@mui/icons-material/Remove";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import CloseIcon from "@mui/icons-material/Close";
 import "./Chat.css";
 import { handleSendMessage } from "./SignalR";
 import { HubConnection, HubConnectionState } from "@microsoft/signalr";
-import { ChatMessage } from "../ProductDetails/ProductDetails";
 import instance from "../../API/instance";
+import { UserContext } from "../../context/UserContext";
+import * as signalR from "@microsoft/signalr";
 import { ApiUrls } from "../../API/Routes";
 
 interface ChatBoxProps {
@@ -239,6 +240,18 @@ export const ChatBox = (props: ChatBoxProps) => {
           value={message}
           placeholder="Scrie un mesaj"
           onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSendMessage(
+                props.connection!,
+                props.channelId,
+                props.myUsername,
+                props.selectedUser,
+                message
+              );
+              setMessage("");
+            }
+          }}
         />
         <NoHoverIconButton
           sx={{

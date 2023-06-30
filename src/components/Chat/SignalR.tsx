@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import * as signalR from "@microsoft/signalr";
+import { ChatContext } from "../../context/ChatContext";
 
 interface message {
   sender: any;
@@ -34,7 +35,7 @@ export const sendJoinChannel = async (
   if (connection && connection.state === signalR.HubConnectionState.Connected) {
     try {
       await connection.send("JoinChannel", id);
-      console.log("Enterd channel!");
+      console.log(`Enterd ${id} channel!`);
     } catch (e) {
       console.error(e);
     }
@@ -67,7 +68,7 @@ export const sendLeaveChannel = async (
   if (connection && connection.state === signalR.HubConnectionState.Connected) {
     try {
       await connection.send("LeaveChannel", id);
-      console.log("Leaved channel!");
+      console.log(`Leaved ${id} channel!`);
     } catch (e) {
       console.error(e);
     }
@@ -118,23 +119,23 @@ export const ChatComponent = () => {
     lastName: "grecu",
   };
 
-  useEffect(() => {
-    if (
-      connection &&
-      connection.state === signalR.HubConnectionState.Connected
-    ) {
-      connection.on("ReceiveMessage", (sender, receivedMessage) => {
-        const newMessage = { sender, message: receivedMessage };
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-      });
+  // useEffect(() => {
+  //   if (
+  //     connection &&
+  //     connection.state === signalR.HubConnectionState.Connected
+  //   ) {
+  //     connection.on("ReceiveMessage", (sender, receivedMessage) => {
+  //       const newMessage = { sender, message: receivedMessage };
+  //       setMessages((prevMessages) => [...prevMessages, newMessage]);
+  //     });
 
-      return () => {
-        connection.off("ReceiveMessage");
-      };
-    } else {
-      console.error("No connection to chatHub yet!");
-    }
-  }, []);
+  //     return () => {
+  //       connection.off("ReceiveMessage");
+  //     };
+  //   } else {
+  //     console.error("No connection to chatHub yet!");
+  //   }
+  // }, []);
 
   return <div>sal</div>;
 };

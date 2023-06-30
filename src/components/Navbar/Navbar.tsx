@@ -62,6 +62,7 @@ export const Navbar = (props: NavBarProps) => {
     setIsAuthenticated,
     notification,
     setNotification,
+    channelId,
   } = useContext(UserContext);
   const [search, setSearch] = useState("");
 
@@ -274,7 +275,8 @@ export const Navbar = (props: NavBarProps) => {
               disableRipple
             >
               <AccountCircleIcon fontSize="large" sx={{ color: "#646FCB" }} />
-              {notification.length > 0 && (
+              {notification.filter((x) => x.receiver === userData.userName)
+                .length > 0 && (
                 <div
                   style={{
                     width: "20px",
@@ -291,10 +293,12 @@ export const Navbar = (props: NavBarProps) => {
                     top: "12px",
                   }}
                 >
-                  {notification.filter((x) => x.receiver !== userData.userName)
+                  {notification.filter((x) => x.receiver === userData.userName)
                     .length > 10
                     ? 9 + "+"
-                    : notification.length}
+                    : notification.filter(
+                        (x) => x.receiver === userData.userName
+                      ).length}
                 </div>
               )}
               <Typography
@@ -366,10 +370,12 @@ export const Navbar = (props: NavBarProps) => {
                     fontStyle: "italic",
                   }}
                 >
-                  {notification.filter((x) => x.receiver !== userData.userName)
+                  {notification.filter((x) => x.receiver === userData.userName)
                     .length > 10
                     ? "Ai " + 9 + "+ conversații noi"
-                    : notification.length === 0
+                    : notification.filter(
+                        (x) => x.receiver === userData.userName
+                      ).length === 0
                     ? ""
                     : "Ai o conversație nouă"}
                 </span>

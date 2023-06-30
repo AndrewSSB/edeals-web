@@ -36,9 +36,14 @@ import {
   getMyReviews,
   getUser,
 } from "../../API/user";
-import { sendJoinChannel, sendLeaveChannel } from "../Chat/SignalR";
+import {
+  sendJoinChannel,
+  sendJoinNotificationChannel,
+  sendLeaveChannel,
+} from "../Chat/SignalR";
 import { ChatBox } from "../Chat/Chatbox";
 import { getOrders } from "../../API/products";
+import { ChatContext } from "../../context/ChatContext";
 
 interface ProfileDataProps {
   tag: string;
@@ -296,10 +301,11 @@ export const UserProfile = () => {
     setConnection,
     notification,
     setNotification,
+    channelId,
+    setChannelId,
   } = useContext(UserContext);
   const [error, setError] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
-  const [channelId, setChannelId] = useState<string>("");
   const [reviews, setReviews] = useState<ReviewsAndQuestions[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
 
@@ -361,8 +367,11 @@ export const UserProfile = () => {
 
   const handleCloseChat = async () => {
     setSelectedUser(null);
-
-    await sendLeaveChannel(connection, channelId);
+    setChannelId("");
+    try {
+      await sendLeaveChannel(connection, channelId);
+      await sendJoinNotificationChannel(connection);
+    } catch {}
   };
 
   const handleSelectedUser = async (user: string) => {
@@ -377,10 +386,16 @@ export const UserProfile = () => {
     }
 
     setSelectedUser(user);
+    setNotification(
+      notification.filter(
+        (notif) => notif.receiver !== userData.userName && notif.sender !== user
+      )
+    );
 
     try {
       setChannelId(userData.userName + "__" + user);
       await sendJoinChannel(connection, userData.userName + "__" + user);
+      await sendLeaveChannel(connection, "generic");
     } catch {
       setError("Ceva nu a mers cum trebuie - hub");
     }
@@ -703,7 +718,7 @@ export const UserProfile = () => {
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    marginBottom: "15px",
+                    margin: "0px 10px 15px 10px",
                   }}
                 >
                   <div>
@@ -726,9 +741,33 @@ export const UserProfile = () => {
                     </Typography>
                   </div>
                   <NoHoverIconButton
-                    onClick={() => handleSelectedUser(conv.receiverUsername)}
+                    onClick={() => {
+                      handleSelectedUser(conv.receiverUsername);
+                    }}
                   >
                     <MessageOutlinedIcon style={{ color: "#646FCB" }} />
+                    {notification.filter(
+                      (x) => x.sender === conv.receiverUsername
+                    ).length > 0 && (
+                      <div
+                        style={{
+                          width: "20px",
+                          height: "20px",
+                          borderRadius: "50%",
+                          position: "absolute",
+                          backgroundColor: "red",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          fontSize: "14px",
+                          color: "white",
+                          left: "23px",
+                          top: "2px",
+                        }}
+                      >
+                        !
+                      </div>
+                    )}
                   </NoHoverIconButton>
                 </div>
               ))}
