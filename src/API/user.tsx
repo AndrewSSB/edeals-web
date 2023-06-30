@@ -62,3 +62,19 @@ export const getMyReviews = async () => {
 
   return response;
 };
+
+export const getUsers = async (username: string | null) => {
+  let url = ApiUrls.getUsers;
+
+  if (username !== null) {
+    url += `?userName=${username}`;
+  }
+
+  const response = await axios.get(url, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+  });
+
+  return response;
+};

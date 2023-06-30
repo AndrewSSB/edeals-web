@@ -71,25 +71,29 @@ export const ChatBox = (props: ChatBoxProps) => {
 
   useEffect(() => {
     const fetchMessages = async () => {
-      const response = await instance.get(
-        ApiUrls.messages + `/${props.channelId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
+      try {
+        const response = await instance.get(
+          ApiUrls.messages + `/${props.channelId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
 
-      setMessages(
-        response.data.map((message: any) => {
-          return {
-            sender: message.sender,
-            receiver: message.receiver,
-            message: message.message,
-            date: message.date,
-          };
-        })
-      );
+        setMessages(
+          response.data.map((message: any) => {
+            return {
+              sender: message.sender,
+              receiver: message.receiver,
+              message: message.message,
+              date: message.date,
+            };
+          })
+        );
+      } catch (err: any) {
+        console.error(err);
+      }
     };
     fetchMessages();
   }, []);
@@ -168,6 +172,15 @@ export const ChatBox = (props: ChatBoxProps) => {
           marginBottom: "5px",
         }}
       >
+        {messages.length === 0 && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "20px",
+            }}
+          ></div>
+        )}
         {messages.map((receivedMessage, index) => {
           const time = new Date(receivedMessage.date);
           const hour = time.getHours();

@@ -30,6 +30,7 @@ type apiUrls = {
   createDraftOrder: string;
   createOrder: string;
   getOrders: string;
+  getUsers: string;
 };
 
 export const ApiUrls: apiUrls = {
@@ -37,6 +38,7 @@ export const ApiUrls: apiUrls = {
   register: `${process.env.REACT_APP_BASE_API_URL}/core/api/authentication/register`,
   logout: `${process.env.REACT_APP_BASE_API_URL}/core/api/authentication/logout`,
   userInfo: `${process.env.REACT_APP_BASE_API_URL}/core/api/user/info`,
+  getUsers: `${process.env.REACT_APP_BASE_API_URL}/core/api/user/all`,
 
   getProducts: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/product/all`,
   getProduct: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/product`,
