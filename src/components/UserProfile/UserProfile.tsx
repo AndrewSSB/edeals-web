@@ -294,6 +294,8 @@ export const UserProfile = () => {
     setConversations,
     connection,
     setConnection,
+    notification,
+    setNotification,
   } = useContext(UserContext);
   const [error, setError] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
