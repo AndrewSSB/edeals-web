@@ -19,16 +19,15 @@ export default function Payment() {
 
   useEffect(() => {
     const createPayment = async () => {
-      const reloadCount = Number(sessionStorage.getItem("reloadCount")) || 0;
-      console.log(reloadCount);
+      // const reloadCount = Number(sessionStorage.getItem("reloadCount")) || 0;
 
-      if (performance.navigation.type === PerformanceNavigation.TYPE_RELOAD) {
-        if (reloadCount === 1) {
-          window.location.href = "/";
-        } else {
-          sessionStorage.setItem("reloadCount", String(reloadCount + 1));
-        }
-      }
+      // if (performance.navigation.type === PerformanceNavigation.TYPE_RELOAD) {
+      //   if (reloadCount === 1) {
+      //     window.location.href = "/";
+      //   } else {
+      //     sessionStorage.setItem("reloadCount", String(reloadCount + 1));
+      //   }
+      // }
 
       try {
         if (shopingSessionId) {

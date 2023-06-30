@@ -1,0 +1,17 @@
+.profile-card {
+  scrollbar-width: thin;
+  scrollbar-color: #646fcb transparent;
+}
+
+.profile-card::-webkit-scrollbar {
+  width: 10px;
+}
+
+.profile-card::-webkit-scrollbar-thumb {
+  background-color: #646fcb;
+  border-radius: 5px;
+}
+
+.profile-card::-webkit-scrollbar-track {
+  background-color: transparent;
+}

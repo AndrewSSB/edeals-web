@@ -7,6 +7,7 @@ import Grid from "@mui/material/Grid";
 import { ShoppingSession, Transport } from "../../context/ProductsContext";
 import "../ProductDetails/Swiper.css";
 import { Address } from "../../context/UserContext";
+import { Checkbox, FormControlLabel } from "@mui/material";
 
 interface ReviewProps {
   shoppingSession: ShoppingSession;
@@ -14,6 +15,10 @@ interface ReviewProps {
   address: Address;
   firstName: string | null;
   lastName: string | null;
+  card?: boolean;
+  setCard?: (value: boolean) => void;
+  ramburs?: boolean;
+  setRamburs?: (value: boolean) => void;
 }
 
 export const DisplayAddress = (props: ReviewProps) => {
@@ -139,6 +144,58 @@ export const Review = (props: ReviewProps) => {
           />
         </Grid>
       </Grid>
+      <div style={{ margin: "10px 0px 10px 0px" }} className="gray-line" />
+      <Typography style={{ marginLeft: "10px", fontSize: "18px" }}>
+        Alege metoda de plată
+      </Typography>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          marginLeft: "10px",
+        }}
+      >
+        <FormControlLabel
+          sx={{
+            justifyContent: "start",
+            width: "100%",
+          }}
+          control={
+            <Checkbox
+              style={{ color: "#646FCB", marginLeft: "10px" }}
+              name="saveAddress"
+              value="yes"
+              checked={props.card}
+              onChange={() => {
+                props.setCard!(true);
+                props.setRamburs!(false);
+              }}
+            />
+          }
+          label="Plata cu cardul"
+        />
+
+        <FormControlLabel
+          sx={{
+            flexDirection: "start",
+            width: "100%",
+          }}
+          control={
+            <Checkbox
+              style={{ color: "#646FCB", marginLeft: "10px" }}
+              name="saveAddress"
+              value="yes"
+              checked={props.ramburs}
+              onChange={() => {
+                props.setRamburs!(true);
+                props.setCard!(false);
+              }}
+            />
+          }
+          label="Ramburs"
+        />
+      </div>
     </React.Fragment>
   );
 };

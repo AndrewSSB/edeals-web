@@ -386,8 +386,6 @@ export const ProductProfile = (props: ProductProfileProps) => {
       favorites,
       setFavorites
     );
-
-    console.log(favorites);
   };
 
   const moveToFavorites = async (product: Product) => {
@@ -397,7 +395,6 @@ export const ProductProfile = (props: ProductProfileProps) => {
   };
 
   const moveToBasket = async (product: Product) => {
-    console.log("test");
     await removeElements(product);
 
     await handleCartItems(
@@ -441,7 +438,7 @@ export const ProductProfile = (props: ProductProfileProps) => {
           justifyContent: "center",
           maxWidth: "1500px",
           minWidth: "600px",
-          margin: "0 auto", // Center horizontally
+          margin: "0 auto",
         }}
       >
         {!props.isInFavoritePage && (

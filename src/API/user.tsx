@@ -42,3 +42,23 @@ export const getAddress = async () => {
 
   return response;
 };
+
+export const getConversations = async () => {
+  const response = await axios.get(ApiUrls.getConversations, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+  });
+
+  return response;
+};
+
+export const getMyReviews = async () => {
+  const response = await axios.get(ApiUrls.getReviews, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+  });
+
+  return response;
+};

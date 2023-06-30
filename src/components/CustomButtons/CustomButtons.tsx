@@ -7,6 +7,8 @@ interface AuthButtonProps {
   type?: "button" | "submit" | "reset";
   onClick?: () => void;
   style?: CSSProperties;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 export const AutenticationButtons = (props: AuthButtonProps) => {
@@ -15,6 +17,8 @@ export const AutenticationButtons = (props: AuthButtonProps) => {
       className="authentication-button"
       type={props.type}
       onClick={props.onClick}
+      onMouseEnter={() => props.onMouseEnter}
+      onMouseLeave={() => props.onMouseLeave}
       style={{
         cursor: "pointer",
         border: "0",

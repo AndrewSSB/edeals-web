@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   PaymentElement,
   LinkAuthenticationElement,
@@ -12,6 +12,8 @@ import {
   StripeLinkAuthenticationElementChangeEvent,
 } from "@stripe/stripe-js";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../../context/UserContext";
+import { createOrder } from "../../API/products";
 
 interface CheckoutFormProps {
   clientSecret: string;
@@ -23,9 +25,10 @@ export default function CheckoutForm({
   const stripe = useStripe() as Stripe;
   const elements = useElements();
 
-  const [email, setEmail] = useState<string>("");
+  const { userData, order } = useContext(UserContext);
   const [message, setMessage] = useState<string | null | undefined>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [email, setEmail] = useState<string>(userData.email);
 
   useEffect(() => {
     if (!stripe) {
@@ -72,7 +75,7 @@ export default function CheckoutForm({
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${process.env.REACT_APP_APP_URL}`,
+        return_url: `http://localhost:3000`,
         receipt_email: email,
       },
     });
@@ -88,6 +91,7 @@ export default function CheckoutForm({
 
   const paymentElementOptions: StripePaymentElementOptions = {
     layout: "tabs",
+    defaultValues: { billingDetails: { email: email } },
   };
 
   useEffect(() => {
@@ -102,6 +106,20 @@ export default function CheckoutForm({
   const handleBack = () => {
     navigate("/");
   };
+
+  console.log(order);
+
+  const confirmOrder = async (orderId: number) => {
+    try {
+      await createOrder(orderId);
+    } catch (ex: any) {
+      console.error(ex);
+    }
+  };
+
+  if (!localStorage.getItem("accessToken")) {
+    localStorage.removeItem("cartItems");
+  }
 
   return (
     <form id="payment-form" onSubmit={handleSubmit}>
@@ -122,7 +140,11 @@ export default function CheckoutForm({
         <button type="button" id="submit" onClick={handleBack}>
           <span id="button-text">Întoarce-te</span>
         </button>
-        <button disabled={isLoading || !stripe || !elements} id="submit">
+        <button
+          disabled={isLoading || !stripe || !elements}
+          id="submit"
+          onClick={() => confirmOrder(order.orderId)}
+        >
           <span id="button-text">
             {isLoading ? (
               <div className="spinner" id="spinner"></div>

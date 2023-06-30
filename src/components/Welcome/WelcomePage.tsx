@@ -4,6 +4,7 @@ import { SubNavBar } from "../Navbar/SubNavbar";
 import { Box } from "@mui/material";
 import { ProductPage } from "../Products/ProductPage";
 import { Product, ProductContext } from "../../context/ProductsContext";
+import { createOrder } from "../../API/products";
 
 interface WelcomePageProps {}
 

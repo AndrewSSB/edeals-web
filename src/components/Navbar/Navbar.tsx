@@ -31,6 +31,7 @@ import Payment from "../Payments/Payment";
 import { getUser } from "../../API/user";
 import { GetProductsFromLocalStorage } from "../../hooks/SetItemsToLocalStorage";
 import { logoutUser } from "../../API/auth";
+import { HubConnectionState } from "@microsoft/signalr";
 
 interface NavBarProps {
   isInBasketPage?: Boolean;
@@ -59,6 +60,8 @@ export const Navbar = (props: NavBarProps) => {
     setLastName,
     isAuthenticated,
     setIsAuthenticated,
+    notification,
+    setNotification,
   } = useContext(UserContext);
   const [search, setSearch] = useState("");
 
@@ -162,17 +165,7 @@ export const Navbar = (props: NavBarProps) => {
 
           const userDetails = response.data.responseData;
 
-          setUserData({
-            firstName: userDetails.firstName,
-            lastName: userDetails.lastName,
-            userName: userDetails.userName,
-            email: userDetails.email,
-            isEmailVerified: userDetails.isEmailVerified,
-            phoneNumber: userDetails.phoneNumber,
-            isPhoneNumberVerified: userDetails.isPhoneNumberVerified,
-            profileImage: "",
-            addresses: userDetails.addresses,
-          });
+          setUserData(userDetails);
 
           setFirstName(userDetails.firstName);
           setLastName(userDetails.lastName);
@@ -184,9 +177,9 @@ export const Navbar = (props: NavBarProps) => {
       }
     };
 
+    fetchUserDetails();
     fetchFavorites();
     fetchCartItems();
-    fetchUserDetails();
   }, []);
 
   const clearSearch = () => {
@@ -281,6 +274,29 @@ export const Navbar = (props: NavBarProps) => {
               disableRipple
             >
               <AccountCircleIcon fontSize="large" sx={{ color: "#646FCB" }} />
+              {notification.length > 0 && (
+                <div
+                  style={{
+                    width: "20px",
+                    height: "20px",
+                    borderRadius: "50%",
+                    position: "absolute",
+                    backgroundColor: "red",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    fontSize: "12px",
+                    color: "white",
+                    left: "36px",
+                    top: "12px",
+                  }}
+                >
+                  {notification.filter((x) => x.receiver !== userData.userName)
+                    .length > 10
+                    ? 9 + "+"
+                    : notification.length}
+                </div>
+              )}
               <Typography
                 variant="body1"
                 sx={{ marginLeft: "8px", color: "black" }}
@@ -341,6 +357,22 @@ export const Navbar = (props: NavBarProps) => {
                   buttonWidth="100%"
                   onClick={SignOut}
                 />
+                <span
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginTop: "20px",
+                    fontSize: "18px",
+                    fontStyle: "italic",
+                  }}
+                >
+                  {notification.filter((x) => x.receiver !== userData.userName)
+                    .length > 10
+                    ? "Ai " + 9 + "+ conversații noi"
+                    : notification.length === 0
+                    ? ""
+                    : "Ai o conversație nouă"}
+                </span>
               </div>
             )}
           </div>

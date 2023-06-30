@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import * as signalR from "@microsoft/signalr";
-import { ChatBox } from "./Chatbox";
 
 interface message {
   sender: any;
@@ -9,7 +8,7 @@ interface message {
 // Realizarea conexiunii dintre client și server
 export const connectToHub = async () => {
   const connection = new signalR.HubConnectionBuilder()
-    .withUrl(`https://localhost:7196/chat`, {
+    .withUrl(`${process.env.REACT_APP_SIGNALR_CHAT}/chat`, {
       // skipNegotiation: true, // doar pt local ?
       // transport: signalR.HttpTransportType.WebSockets,
     })
@@ -44,6 +43,22 @@ export const sendJoinChannel = async (
   }
 };
 
+export const sendJoinNotificationChannel = async (
+  connection: signalR.HubConnection | null
+) => {
+  if (connection && connection.state === signalR.HubConnectionState.Connected) {
+    try {
+      await connection.send("JoinNotificationChannel");
+
+      console.log("Entered notification channel!");
+    } catch (e) {
+      console.error(e);
+    }
+  } else {
+    console.error("No connection to chatHub yet!");
+  }
+};
+
 // Parăsirea cemerei private
 export const sendLeaveChannel = async (
   connection: signalR.HubConnection | null,
@@ -65,12 +80,13 @@ export const sendLeaveChannel = async (
 export const handleSendMessage = (
   connection: signalR.HubConnection,
   channelId: string,
-  username: string,
+  sender: string,
+  receiver: string,
   message: string
 ) => {
   if (connection && connection.state === signalR.HubConnectionState.Connected) {
     connection
-      .invoke("SendMessage", channelId, username, message)
+      .invoke("SendMessage", channelId, sender, receiver, message)
       .then(() => {
         console.log("Message sent successfully.");
       })

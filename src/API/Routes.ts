@@ -18,6 +18,7 @@ type apiUrls = {
 
   paymentIntent: string;
   messages: string;
+  getConversations: string;
   categories: string;
   addReview: string;
   addQuestion: string;
@@ -25,6 +26,10 @@ type apiUrls = {
   getDiscount: string;
   saveAddress: string;
   getAddress: string;
+  getReviews: string;
+  createDraftOrder: string;
+  createOrder: string;
+  getOrders: string;
 };
 
 export const ApiUrls: apiUrls = {
@@ -48,6 +53,7 @@ export const ApiUrls: apiUrls = {
   paymentIntent: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/paymentcontroll`,
 
   messages: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/messages`,
+  getConversations: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/messages/conversations`,
 
   categories: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/category/all`,
 
@@ -59,4 +65,9 @@ export const ApiUrls: apiUrls = {
 
   saveAddress: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/userinfo/save-address`,
   getAddress: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/userinfo`,
+
+  getReviews: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/review/reviews`,
+  createDraftOrder: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/order/draft`,
+  createOrder: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/order`,
+  getOrders: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/order`,
 };

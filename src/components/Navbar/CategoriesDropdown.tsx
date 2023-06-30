@@ -2,6 +2,7 @@ import { Typography } from "@mui/material";
 import { Category } from "../../context/ProductsContext";
 import { useState } from "react";
 import React from "react";
+import "../UserProfile/UserProfile.css";
 
 interface CategoriesDropdownProps {
   categories: Category[];
@@ -40,7 +41,10 @@ export const CategoryItem = (props: CategoryItemProps) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div style={{ width: "100%" }}>
+      <div
+        style={{ width: "100%" }}
+        onClick={() => props.onClick(props.category.categoryId)}
+      >
         <Typography
           sx={{
             fontSize: "15px",
@@ -148,6 +152,7 @@ export const SubCategoriesDropdown = (props: SubCategoriesDropdownProps) => {
         {hoveredSubCategoryId === subCategory.categoryId &&
           subCategory.subCategories?.length! > 0 && (
             <div
+              className="profile-card"
               style={{
                 position: "absolute",
                 top: "0",
@@ -159,6 +164,8 @@ export const SubCategoriesDropdown = (props: SubCategoriesDropdownProps) => {
                 padding: "20px",
                 boxShadow: "0px 2px 4px rgba(100, 111, 203, 0.6)",
                 zIndex: 1,
+                scrollbarWidth: "thin",
+                scrollbarColor: "#646FCB transparent",
               }}
             >
               <SubCategoriesDropdown

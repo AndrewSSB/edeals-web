@@ -1,5 +1,6 @@
 import axios from "axios";
 import { ApiUrls } from "./Routes";
+import { Address } from "../context/UserContext";
 
 interface ProductsProps {
   start: number | null;
@@ -110,6 +111,65 @@ export const applyShoppingDiscount = async (
 
 export const getDiscount = async (value: string) => {
   const response = await axios.get(`${ApiUrls.getDiscount}/${value}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+  });
+
+  return response;
+};
+
+// order
+
+export interface LocalShopping {
+  productId: string;
+  quantity: number;
+}
+
+export const createDraftOrder = async (
+  transportPrice: number,
+  paymentType: number,
+  userAddress: Address,
+  shoppingSessionId?: number,
+  total?: number,
+  localShopping?: LocalShopping[]
+) => {
+  const response = await axios.post(
+    `${ApiUrls.createDraftOrder}`,
+    {
+      transportPrice: transportPrice,
+      paymentType: paymentType,
+      userAddress,
+      shoppingSessionId: shoppingSessionId,
+      total: total,
+      localShopping: localShopping,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
+
+  return response;
+};
+
+export const createOrder = async (orderId: number) => {
+  const response = await axios.post(
+    `${ApiUrls.createOrder}/${orderId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
+
+  return response;
+};
+
+export const getOrders = async () => {
+  const response = await axios.get(`${ApiUrls.getOrders}`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
     },

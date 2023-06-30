@@ -20,6 +20,7 @@ import {
 import { Address, User, UserContext } from "../../context/UserContext";
 import { Alert, AlertTitle, Slide, Snackbar } from "@mui/material";
 import { getAddress, saveUserAddress } from "../../API/user";
+import { createDraftOrder, createOrder } from "../../API/products";
 
 const steps = ["Shipping address", "Review your order"];
 
@@ -38,12 +39,17 @@ export default function Checkout() {
     setFirstName,
     lastName,
     setLastName,
+    order,
+    setOrder,
   } = useContext(UserContext);
   const navigate = useNavigate();
 
   const [address, setAddress] = useState<Address>({});
   const [error, setError] = useState<string | null>(null);
   const [saveAddress, setSaveAddress] = useState(false);
+
+  const [card, setCard] = useState(true);
+  const [ramburs, setRamburs] = useState(false);
 
   const handleCloseSnackbar = () => {
     setError(null);
@@ -85,6 +91,10 @@ export default function Checkout() {
             firstName={firstName}
             lastName={lastName}
             transport={transport}
+            card={card}
+            setCard={setCard}
+            ramburs={ramburs}
+            setRamburs={setRamburs}
           />
         );
       default:
@@ -134,7 +144,47 @@ export default function Checkout() {
     setActiveStep(activeStep + 1);
 
     if (activeStep === steps.length - 1) {
-      handleProductDetails();
+      if (card) {
+        handleProductDetails();
+      }
+
+      // trebuie scoas check-u asta si pt aia fara
+      if (localStorage.getItem("accessToken")) {
+        const response = await createDraftOrder(
+          transport.transportPrice,
+          card ? 1 : 0,
+          address,
+          shoppingSession.shoppingSessionId
+        );
+
+        const orderId = response.data.responseData;
+        setOrder({ orderId: orderId });
+
+        if (ramburs) {
+          await createOrder(orderId);
+          window.location.href = "/";
+        }
+      } else {
+        const response = await createDraftOrder(
+          transport.transportPrice,
+          card ? 1 : 0,
+          address,
+          undefined,
+          shoppingSession.total,
+          shoppingSession.cartItems.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+          }))
+        );
+        const orderId = response.data.responseData;
+        setOrder({ orderId: orderId });
+
+        if (ramburs) {
+          await createOrder(orderId);
+          localStorage.removeItem("cartItems");
+          window.location.href = "/";
+        }
+      }
     }
   };
 
@@ -159,8 +209,8 @@ export default function Checkout() {
         setUserData(userData);
 
         setAddress(addresses[0]);
-      } catch {
-        console.error("n-a mers addresses");
+      } catch (ex: any) {
+        console.error(ex);
       }
     };
 

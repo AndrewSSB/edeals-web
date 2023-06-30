@@ -70,9 +70,9 @@ export const calculateAverageRating = (product: Product) => {
 };
 
 export const ProductDetails = (props: ProductDetailsProps) => {
-  const { userData, isAuthenticated } = useContext(UserContext);
+  const { userData, isAuthenticated, connection, setConnection } =
+    useContext(UserContext);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
-  const [connection, setConnection] = useState<HubConnection | null>(null);
   const [channelId, setChannelId] = useState<string>("");
   const [product, setProduct] = useState<Product | undefined>();
   const {
@@ -109,17 +109,6 @@ export const ProductDetails = (props: ProductDetailsProps) => {
     setSearch("");
     handleSearch(null);
   };
-
-  useEffect(() => {
-    const getConnection = async () => {
-      try {
-        const response = await connectToHub();
-        setConnection(response);
-      } catch {}
-    };
-
-    getConnection();
-  }, []);
 
   const handleSelectedUser = async (user: string) => {
     if (!userData.userName) {

@@ -27,6 +27,7 @@ interface ChatBoxProps {
 
 export interface message {
   sender: string;
+  receiver: string;
   message: string;
   date: string;
 }
@@ -81,7 +82,8 @@ export const ChatBox = (props: ChatBoxProps) => {
       setMessages(
         response.data.map((message: any) => {
           return {
-            sender: message.username,
+            sender: message.sender,
+            receiver: message.receiver,
             message: message.message,
             date: message.date,
           };
@@ -96,10 +98,18 @@ export const ChatBox = (props: ChatBoxProps) => {
       props.connection &&
       props.connection.state === HubConnectionState.Connected
     ) {
-      props.connection.on("ReceiveMessage", (sender, receivedMessage, date) => {
-        const newMessage = { sender, message: receivedMessage, date };
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-      });
+      props.connection.on(
+        "ReceiveMessage",
+        (sender, receiver, receivedMessage, date) => {
+          const newMessage = {
+            sender: sender,
+            receiver: receiver,
+            message: receivedMessage,
+            date,
+          };
+          setMessages((prevMessages) => [...prevMessages, newMessage]);
+        }
+      );
 
       return () => {
         props.connection!.off("ReceiveMessage");
@@ -169,7 +179,7 @@ export const ChatBox = (props: ChatBoxProps) => {
             <div
               key={index}
               style={
-                receivedMessage.sender === props.myUsername
+                receivedMessage.sender !== props.selectedUser
                   ? myMessages
                   : otherPersonMessages
               }
@@ -240,6 +250,7 @@ export const ChatBox = (props: ChatBoxProps) => {
               props.connection!,
               props.channelId,
               props.myUsername,
+              props.selectedUser,
               message
             );
             setMessage("");
