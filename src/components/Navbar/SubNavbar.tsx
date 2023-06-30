@@ -317,7 +317,7 @@ export const UserCard = (
               {props.userName}
             </Typography>
           </div>
-          {!props.isEmailVerified && !props.isPhoneNumberVerified && (
+          {props.isEmailVerified && props.isPhoneNumberVerified && (
             <div
               style={{
                 display: "flex",
