@@ -1,7 +1,10 @@
 import { LogoImage } from "../Navbar/NavbarElements";
 import logo from "../../images/logo.png";
+import { useNavigate } from "react-router-dom";
 
 export const NotFoundPage = () => {
+  const navigate = useNavigate();
+
   return (
     <div
       style={{
@@ -23,14 +26,16 @@ export const NotFoundPage = () => {
           alignItems: "center",
           justifyContent: "center",
           borderRadius: "8px",
-          boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+          boxShadow: "0px 0px 10px rgba(100, 111, 203, 0.3)",
         }}
       >
-        <LogoImage
-          src={logo}
-          alt="Logo"
-          style={{ width: "120px", marginBottom: "20px" }}
-        />
+        <div onClick={() => navigate("/")}>
+          <LogoImage
+            src={logo}
+            alt="Logo"
+            style={{ width: "120px", marginBottom: "20px", cursor: "pointer" }}
+          />
+        </div>
         <h1
           style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "10px" }}
         >

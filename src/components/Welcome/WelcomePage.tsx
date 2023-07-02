@@ -4,19 +4,26 @@ import { SubNavBar } from "../Navbar/SubNavbar";
 import { Box } from "@mui/material";
 import { ProductPage } from "../Products/ProductPage";
 import { Product, ProductContext } from "../../context/ProductsContext";
-import { createOrder } from "../../API/products";
+import { createOrder, getProducts } from "../../API/products";
 
 interface WelcomePageProps {}
 
 export const WelcomePage = () => {
   const [categoryId, setCategoryId] = useState<number>();
-  const { products } = useContext(ProductContext);
-  const [copyProducts, setCopyProducts] = useState<Product[]>([]);
+  const { products, setProducts } = useContext(ProductContext);
+  const [categoryName, setCategoryName] = useState("");
 
-  const searchByCategory = (categoryId: number) => {
-    console.log(categoryId);
-    setCategoryId(categoryId);
-    // setCopyProducts(products.filter(product => product.categories.));
+  const searchByCategory = async (categoryId: number) => {
+    const response = await getProducts({
+      start: null,
+      limit: null,
+      productName: null,
+      categoryId: categoryId,
+    });
+
+    const responseData = response.data.responseData;
+    // setProducts(responseData.data);
+    console.log(responseData);
   };
 
   return (

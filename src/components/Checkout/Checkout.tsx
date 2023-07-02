@@ -144,10 +144,6 @@ export default function Checkout() {
     setActiveStep(activeStep + 1);
 
     if (activeStep === steps.length - 1) {
-      if (card) {
-        handleProductDetails();
-      }
-
       // trebuie scoas check-u asta si pt aia fara
       if (localStorage.getItem("accessToken")) {
         const response = await createDraftOrder(
@@ -184,6 +180,10 @@ export default function Checkout() {
           localStorage.removeItem("cartItems");
           window.location.href = "/";
         }
+      }
+
+      if (card) {
+        handleProductDetails();
       }
     }
   };

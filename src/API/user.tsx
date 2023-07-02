@@ -12,6 +12,44 @@ export const getUser = async () => {
   return response;
 };
 
+interface updateUserProps {
+  firstName: string | null | undefined;
+  lastName: string | null | undefined;
+  email: string | null | undefined;
+  phoneNumber: string | null | undefined;
+  username: string | null | undefined;
+}
+
+export const updateUser = async (props: updateUserProps) => {
+  const response = await axios.put(
+    `${ApiUrls.updateUser}`,
+    {
+      firstName: props.firstName,
+      lastName: props.lastName,
+      email: props.email,
+      phoneNumber: props.phoneNumber,
+      username: props.username,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
+
+  return response;
+};
+
+export const closeAccount = async () => {
+  const response = await axios.delete(`${ApiUrls.deleteAccount}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+  });
+
+  return response;
+};
+
 export const saveUserAddress = async (props: Address) => {
   const response = await axios.post(
     `${ApiUrls.saveAddress}`,
@@ -75,6 +113,62 @@ export const getUsers = async (username: string | null) => {
       Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
     },
   });
+
+  return response;
+};
+
+export const sendEmailVerificationCode = async () => {
+  const response = await axios.post(
+    `${ApiUrls.sendEmailCode}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
+
+  return response;
+};
+
+export const confirmEmail = async (token: string) => {
+  const response = await axios.post(
+    `${ApiUrls.validateEmail}`,
+    { token: token },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
+
+  return response;
+};
+
+export const sendPhoneVerificationCode = async () => {
+  const response = await axios.post(
+    `${ApiUrls.sendPhoneCode}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
+
+  return response;
+};
+
+export const confirmPhoneNumber = async (digitCode: string) => {
+  const response = await axios.post(
+    `${ApiUrls.validatePhone}/${digitCode}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
 
   return response;
 };

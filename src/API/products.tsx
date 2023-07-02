@@ -6,6 +6,7 @@ interface ProductsProps {
   start: number | null;
   limit: number | null;
   productName: string | null;
+  categoryId: number | null;
 }
 
 interface FavoriteProps {
@@ -18,9 +19,14 @@ interface CartItemProps {
 }
 
 export const getProducts = async (props: ProductsProps) => {
-  let apiUrl = `${ApiUrls.getProducts}`;
-  if (props.productName && props.productName != "") {
-    apiUrl = `${apiUrl}?productName=${props.productName}`;
+  let apiUrl = `${ApiUrls.getProducts}?`;
+
+  if (props.productName && props.productName !== "") {
+    apiUrl += `productName=${props.productName}&`;
+  }
+
+  if (props.categoryId) {
+    apiUrl += `categoryId=${props.categoryId}&`;
   }
 
   const response = await axios.get(`${apiUrl}`, {

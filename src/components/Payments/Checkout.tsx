@@ -112,14 +112,13 @@ export default function CheckoutForm({
   const confirmOrder = async (orderId: number) => {
     try {
       await createOrder(orderId);
+      if (!localStorage.getItem("accessToken")) {
+        localStorage.removeItem("cartItems");
+      }
     } catch (ex: any) {
       console.error(ex);
     }
   };
-
-  if (!localStorage.getItem("accessToken")) {
-    localStorage.removeItem("cartItems");
-  }
 
   return (
     <form id="payment-form" onSubmit={handleSubmit}>

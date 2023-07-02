@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  CSSProperties,
-  useContext,
-} from "react";
+import React, { useState, useEffect, useRef, CSSProperties } from "react";
 import { NoHoverIconButton } from "../Navbar/NavbarElements";
 import { Box, Card, Typography } from "@mui/material";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -14,9 +8,8 @@ import "./Chat.css";
 import { handleSendMessage } from "./SignalR";
 import { HubConnection, HubConnectionState } from "@microsoft/signalr";
 import instance from "../../API/instance";
-import { UserContext } from "../../context/UserContext";
-import * as signalR from "@microsoft/signalr";
 import { ApiUrls } from "../../API/Routes";
+import "../UserProfile/UserProfile.css";
 
 interface ChatBoxProps {
   selectedUser: string;
@@ -159,9 +152,10 @@ export const ChatBox = (props: ChatBoxProps) => {
           <CloseIcon />
         </NoHoverIconButton>
       </Box>
-      <Box
+      <div
+        className="profile-card"
         ref={messageContainerRef}
-        sx={{
+        style={{
           backgroundColor: "#white",
           flex: 1,
           borderRadius: "5px 5px 0 0",
@@ -170,6 +164,7 @@ export const ChatBox = (props: ChatBoxProps) => {
           overflowY: "auto",
           padding: "10px",
           marginBottom: "5px",
+          scrollbarColor: "#646fcb transparent",
         }}
       >
         {messages.length === 0 && (
@@ -179,7 +174,9 @@ export const ChatBox = (props: ChatBoxProps) => {
               justifyContent: "center",
               marginTop: "20px",
             }}
-          ></div>
+          >
+            Fi primul care incepe conversatia!
+          </div>
         )}
         {messages.map((receivedMessage, index) => {
           const time = new Date(receivedMessage.date);
@@ -235,7 +232,8 @@ export const ChatBox = (props: ChatBoxProps) => {
             </div>
           );
         })}
-      </Box>
+      </div>
+
       <Box
         sx={{
           backgroundColor: "#F7F7F7",

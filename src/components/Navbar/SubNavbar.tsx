@@ -38,13 +38,20 @@ interface UserInfo {
 export const SubNavBar = (props: SubNavBarProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  const { categories, setCategories } = useContext(ProductContext);
+  const { categories, setCategories, products, setProducts } =
+    useContext(ProductContext);
   const [search, setSearch] = useState("");
   const [focus, setFocus] = useState(false);
   const [usersInfo, setUsersInfo] = useState<UserInfo[]>([]);
 
-  const { channelId, setChannelId, connection, userData } =
-    useContext(UserContext);
+  const {
+    channelId,
+    setChannelId,
+    connection,
+    userData,
+    notification,
+    setNotification,
+  } = useContext(UserContext);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
   const clearSearch = () => {
@@ -81,10 +88,7 @@ export const SubNavBar = (props: SubNavBarProps) => {
 
         const users = response.data.responseData;
 
-        const multipliedUsers = users.flatMap((user: UserInfo) =>
-          Array.from({ length: 10 }, () => user)
-        );
-        setUsersInfo(multipliedUsers);
+        setUsersInfo(users);
       } catch (e) {
         console.error(e);
       }
@@ -105,6 +109,13 @@ export const SubNavBar = (props: SubNavBarProps) => {
   const handleSelectedUser = async (user: string) => {
     setSelectedUser(user);
     try {
+      setNotification(
+        notification.filter(
+          (notif) =>
+            notif.receiver !== userData.userName && notif.sender !== user
+        )
+      );
+
       setChannelId(userData.userName + "__" + user);
       await sendJoinChannel(connection, userData.userName + "__" + user);
       await sendLeaveChannel(connection, "generic");
@@ -169,6 +180,15 @@ export const SubNavBar = (props: SubNavBarProps) => {
             </div>
           )}
         </div>
+        <span
+          style={{
+            fontSize: "18px",
+            fontWeight: " 400",
+            marginLeft: "50%",
+          }}
+        >
+          Filtre
+        </span>
       </Toolbar>
       {localStorage.getItem("accessToken") && (
         <div>
@@ -219,7 +239,8 @@ export const SubNavBar = (props: SubNavBarProps) => {
             right: "18px",
             left: "auto",
             width: "260px",
-            height: "300px",
+            maxHeight: "300px",
+            height: "auto",
             backgroundColor: "#F7F7F7",
             padding: "5px 10px",
             boxShadow: "0px 0px 4px rgba(100, 111, 203, 0.6)",

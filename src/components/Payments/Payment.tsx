@@ -7,6 +7,7 @@ import { createPaymentIntent } from "../../API/payments";
 import "./Payment.css";
 import { useParams } from "react-router-dom";
 import { ProductContext } from "../../context/ProductsContext";
+import { UserContext } from "../../context/UserContext";
 
 const stripePromise = loadStripe(
   "pk_test_51NHtSfG4Hk7olvlPhiMdV5X5pVGbGwREM0BVJVj91T6rag6yyHkWqzV0nNyVG9XIvDGVrxsdcLL5fxvWVvNXRSAE00Y6wwGRTq"
@@ -16,6 +17,7 @@ export default function Payment() {
   const [clientSecret, setClientSecret] = useState<string>("");
   const { shopingSessionId } = useParams();
   const { shoppingSession, transport } = useContext(ProductContext);
+  const { order } = useContext(UserContext);
 
   useEffect(() => {
     const createPayment = async () => {
@@ -37,6 +39,7 @@ export default function Payment() {
             transport.transportPrice;
 
           const response = await createPaymentIntent(
+            order.orderId,
             amountToPay,
             shopingSessionId && +shopingSessionId != 0
               ? +shopingSessionId

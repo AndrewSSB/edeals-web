@@ -37,8 +37,8 @@ import "./Swiper.css";
 import { Reviews } from "./Reviews";
 import React from "react";
 import { addQuestion, addReview, getProduct } from "../../API/products";
-import { Review } from "../Checkout/Review";
 import { handleCartItems, handleFavorites } from "../Products/ProductCard";
+import { Review, Comment } from "../../context/ProductsContext";
 
 export interface ChatMessage {
   date: string;
@@ -87,16 +87,16 @@ export const ProductDetails = (props: ProductDetailsProps) => {
   const [search, setSearch] = useState("");
 
   const [ratingValue, setRatingValue] = useState(0);
+  const [productRating, setProductRating] = useState(0);
+  const [numberOfReviews, setNumberOfReviews] = useState(0);
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewsCopy, setReviewsCopy] = useState<Review[]>([]);
   const [showCommentForm, setShowCommentForm] = useState(false);
+  const [commentsCopy, setCommentsCopy] = useState<Comment[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const handleCloseSnackbar = () => {
     setError(null);
-  };
-
-  const handleSearch = async (value: string | null) => {
-    console.log("Seaching...");
   };
 
   const searchChange = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -108,6 +108,38 @@ export const ProductDetails = (props: ProductDetailsProps) => {
   const clearSearch = () => {
     setSearch("");
     handleSearch(null);
+  };
+
+  const handleSearch = async (value: string | null) => {
+    if (product?.comments) {
+      if (value !== null) {
+        setCommentsCopy(product?.comments);
+        const _comments = product.comments.filter((comm) =>
+          comm.username.includes(value)
+        );
+
+        product.comments = _comments;
+        setProduct(product);
+      } else {
+        product.comments = commentsCopy;
+        setProduct(product);
+      }
+    }
+
+    if (product?.reviews) {
+      if (value !== null) {
+        setReviewsCopy(product?.reviews);
+        const _reviews = product.reviews.filter((comm) =>
+          comm.username.includes(value)
+        );
+
+        product.reviews = _reviews;
+        setProduct(product);
+      } else {
+        product.reviews = reviewsCopy;
+        setProduct(product);
+      }
+    }
   };
 
   const handleSelectedUser = async (user: string) => {
@@ -206,7 +238,9 @@ export const ProductDetails = (props: ProductDetailsProps) => {
         const response = await getProduct({ productId });
 
         const prod = response.data.responseData;
+        setProductRating(calculateAverageRating(prod));
         setProduct(prod);
+        setNumberOfReviews(prod.reviews.length);
       }
     };
 
@@ -425,7 +459,13 @@ export const ProductDetails = (props: ProductDetailsProps) => {
           >
             Recenzii și Întrebări
           </Typography>
-          <SearchContainer style={{ maxWidth: "300px", height: "50px" }}>
+          <SearchContainer
+            style={{
+              maxWidth: "300px",
+              height: "50px",
+              backgroundColor: "white",
+            }}
+          >
             <SearchInput
               placeholder="Caută o recenzie sau întrebare"
               color="primary"
@@ -482,13 +522,11 @@ export const ProductDetails = (props: ProductDetailsProps) => {
                 margin: "20px 0px 20px 40px",
               }}
             >
-              <span style={{ fontSize: "40px" }}>
-                {calculateAverageRating(product!)}
-              </span>
+              <span style={{ fontSize: "40px" }}>{productRating}</span>
               <Rating
                 name="product-rating"
                 precision={0.5}
-                value={calculateAverageRating(product!)}
+                value={productRating}
                 readOnly
                 style={{
                   fontSize: "36px",
@@ -503,8 +541,8 @@ export const ProductDetails = (props: ProductDetailsProps) => {
                   fontStyle: "italic",
                 }}
               >
-                {product?.reviews.length}{" "}
-                {product?.reviews.length == 1 ? "recenzie" : "recenzii"}
+                {numberOfReviews}{" "}
+                {numberOfReviews === 1 ? "recenzie" : "recenzii"}
               </span>
             </div>
             <div

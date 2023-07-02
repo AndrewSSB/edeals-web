@@ -193,6 +193,7 @@ export const Navbar = (props: NavBarProps) => {
       start: null,
       limit: null,
       productName: value,
+      categoryId: null,
     });
 
     const responseData = response.data.responseData;
@@ -366,6 +367,7 @@ export const Navbar = (props: NavBarProps) => {
                     display: "flex",
                     justifyContent: "center",
                     marginTop: "20px",
+                    marginBottom: "-20px",
                     fontSize: "18px",
                     fontStyle: "italic",
                   }}

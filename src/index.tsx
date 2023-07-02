@@ -17,6 +17,7 @@ import { AddressForm } from "./components/Checkout/AddressForm";
 import Checkout from "./components/Checkout/Checkout";
 import { useContext, useEffect } from "react";
 import { ChatContext, ChatContextProvider } from "./context/ChatContext";
+import { VerifyEmail } from "./components/UserProfile/VerifyEmailPage";
 
 const App = () => {
   return (
@@ -32,6 +33,10 @@ const App = () => {
           <Route path="/product/:productId" element={<ProductDetails />} />
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route
+            path="/api/authentication/confirm-email/*"
+            element={<VerifyEmail />}
+          />
           {/* <Route path="/test" element={<Test />} /> */}
           {/* <Route path="/agora" element={<AgoraChat />} /> */}
           {/* <Route path="/chat" element={<ChatComponent />} /> */}

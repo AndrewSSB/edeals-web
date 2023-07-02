@@ -1,5 +1,6 @@
 import {
   CSSProperties,
+  ChangeEvent,
   ReactNode,
   useContext,
   useEffect,
@@ -31,10 +32,15 @@ import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
 import NewReleasesOutlinedIcon from "@mui/icons-material/NewReleasesOutlined";
 import "./UserProfile.css";
 import {
+  closeAccount,
+  confirmPhoneNumber,
   getAddress,
   getConversations,
   getMyReviews,
   getUser,
+  sendEmailVerificationCode,
+  sendPhoneVerificationCode,
+  updateUser,
 } from "../../API/user";
 import {
   sendJoinChannel,
@@ -44,8 +50,12 @@ import {
 import { ChatBox } from "../Chat/Chatbox";
 import { getOrders } from "../../API/products";
 import { ChatContext } from "../../context/ChatContext";
+import { AutenticationButtons } from "../CustomButtons/CustomButtons";
+import ClearIcon from "@mui/icons-material/Clear";
+import CheckIcon from "@mui/icons-material/Check";
 
 interface ProfileDataProps {
+  index: number;
   tag: string;
   text: string;
   style?: CSSProperties;
@@ -60,9 +70,181 @@ interface ProfileCardProps {
   style?: CSSProperties;
 }
 
+interface ValidateInputProps {
+  tag: string;
+  code: string;
+  setCode: (value: string) => void;
+  handleValidate: (value: string) => void;
+}
+
+const ValidateInput = (props: ValidateInputProps) => {
+  const [niceCode, setNiceCode] = useState<string>("");
+
+  const handleCodeChange = (e: string) => {
+    const code = e.replace(/\D/g, "").slice(0, 6);
+
+    props.setCode(code);
+
+    const first = code.slice(0, 3).split("").join(" ");
+    const second = code.slice(3, 6).split("").join(" ");
+
+    const formattedCode = first + (second ? " - " + second : "");
+    setNiceCode(formattedCode);
+  };
+
+  return (
+    <div
+      style={{
+        marginTop: "20px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center ",
+        width: "100%",
+      }}
+    >
+      <span
+        style={{
+          fontStyle: "italic",
+          fontSize: "16px",
+          textAlign: "center",
+        }}
+      >
+        Ți-am trimis un cod de verificare pe{" "}
+        {props.tag.toLowerCase() === "email" ? "email" : "telefon"}
+      </span>
+      <input
+        id="discount"
+        placeholder="9 4 1 - 8 5 3"
+        type="text"
+        style={{
+          marginTop: "10px",
+          width: "100px",
+          wordSpacing: "2px",
+          textAlign: "center",
+        }}
+        value={niceCode}
+        onChange={(event) => handleCodeChange(event.target.value)}
+      />
+      <AutenticationButtons
+        buttonText={`Verifică ${
+          props.tag.toLowerCase() === "email" ? "emailul" : "telefonul"
+        }`}
+        buttonWidth={"120px"}
+        style={{ height: "40px", marginTop: "20px" }}
+        onClick={() => props.handleValidate(props.code)}
+      />
+    </div>
+  );
+};
+
+interface updateUser {
+  firstName: string | null | undefined;
+  lastName: string | null | undefined;
+  email: string | null | undefined;
+  phoneNumber: string | null | undefined;
+  username: string | null | undefined;
+}
+
 const ProfileData = (props: ProfileDataProps) => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const [showButton, setShowButton] = useState(false);
+  const [showVerification, setShowVerification] = useState(false);
+  const [validateEmail, setValidateEmail] = useState(false);
+  const [validatePhone, setValidatePhone] = useState(false);
+  const [code, setCode] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+  const [isVerified, setIsVerified] = useState(props.isVerified);
+  const [edit, setEdit] = useState(false);
+  const [editValue, setEditValue] = useState("");
+  const [hasBeenEdited, setHasBeenEdited] = useState(false);
+
+  useEffect(() => {
+    setIsVerified(props.isVerified);
+  }, [props.isVerified]);
+
+  const setEmailOrPhone = async (value: string) => {
+    if (value === "Email" || value === "email") {
+      try {
+        await sendEmailVerificationCode();
+        setValidateEmail(true);
+      } catch (ex: any) {
+        setValidateEmail(false);
+        setError(ex.response.data.errors[0].description);
+      }
+      return;
+    }
+
+    try {
+      await sendPhoneVerificationCode();
+      setValidatePhone(true);
+    } catch (ex: any) {
+      setError(ex.response.data.errors[0].description);
+      if (ex.response.data.errors[0].code !== 202) {
+        setValidatePhone(false);
+      }
+    }
+    return;
+  };
+
+  const handleValidate = async (digitCode: string) => {
+    if (validateEmail) {
+    }
+
+    if (validatePhone) {
+      try {
+        await confirmPhoneNumber(digitCode);
+        setIsVerified(true);
+        setShowVerification(false);
+      } catch (err: any) {
+        setError(err.response.data.errors[0].description);
+      }
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setError(null);
+  };
+
+  const updateUserInfo = async (index: number, value: string) => {
+    if (value !== "") {
+      let userInfoValues: updateUser = {
+        firstName: null,
+        lastName: null,
+        email: null,
+        phoneNumber: null,
+        username: null,
+      };
+
+      switch (index) {
+        case 1:
+          userInfoValues.firstName = value;
+          break;
+        case 2:
+          userInfoValues.lastName = value;
+          break;
+        case 3:
+          userInfoValues.username = value;
+          break;
+        case 4:
+          userInfoValues.email = value;
+          setIsVerified(false);
+          break;
+        case 5:
+          userInfoValues.phoneNumber = value;
+          setIsVerified(false);
+          break;
+        default:
+          return;
+      }
+
+      try {
+        await updateUser(userInfoValues);
+        setEdit(false);
+        setHasBeenEdited(true);
+      } catch (ex: any) {
+        console.log(ex);
+      }
+    }
+  };
 
   const buttonTimer = useRef<NodeJS.Timeout | null>(null);
   return (
@@ -87,15 +269,34 @@ const ProfileData = (props: ProfileDataProps) => {
             alignItems: "center",
           }}
         >
-          <Typography
-            style={{
-              fontStyle: "italic",
-              fontSize: "16px",
-              marginRight: "30px",
-            }}
-          >
-            {props.text}
-          </Typography>
+          {edit === false ? (
+            <Typography
+              style={{
+                fontStyle: "italic",
+                fontSize: "16px",
+                marginRight: "30px",
+              }}
+            >
+              {hasBeenEdited ? editValue : props.text}
+            </Typography>
+          ) : (
+            <input
+              type="text"
+              value={editValue}
+              placeholder={props.text}
+              onChange={(e) => setEditValue(e.target.value)}
+              autoFocus
+              style={{
+                fontStyle: "italic",
+                width: "200px",
+                textAlign: "right",
+                fontSize: "16px",
+                border: "none",
+                outline: "none",
+              }}
+            />
+          )}
+
           <div
             style={{
               position: "relative",
@@ -104,33 +305,38 @@ const ProfileData = (props: ProfileDataProps) => {
           >
             <div
               style={{
-                width: "40px",
-                marginRight: "10px",
+                width: "30px",
+                display: "flex",
+                justifyContent: "center",
+                marginRight: "5px",
               }}
             >
-              {props.isVerified && (
+              {isVerified && !edit && (
                 <VerifiedTwoToneIcon
-                  style={{ color: "#646FCB" }}
+                  style={{
+                    color: "#646FCB",
+                    cursor: "pointer",
+                  }}
                   onMouseEnter={() => setShowTooltip(true)}
                   onMouseLeave={() => setShowTooltip(false)}
                 />
               )}
-              {props.isVerified === false && (
+              {isVerified === false && edit === false && (
                 <NewReleasesOutlinedIcon
-                  style={{ color: "#646FCB" }}
+                  style={{ color: "red", cursor: "pointer" }}
                   onMouseEnter={() => {
-                    setShowButton(true);
+                    setShowVerification(true);
                     clearTimeout(buttonTimer.current!);
                   }}
                   onMouseLeave={() => {
                     buttonTimer.current! = setTimeout(() => {
-                      setShowButton(false);
+                      setShowVerification(false);
                     }, 3000);
                   }}
                 />
               )}
             </div>
-            {showTooltip && props.isVerified && (
+            {showTooltip && isVerified && (
               <div
                 style={{
                   position: "absolute",
@@ -151,40 +357,90 @@ const ProfileData = (props: ProfileDataProps) => {
                 </span>
               </div>
             )}
-            {showButton && (
-              <button
-                className="authentication-button"
+            {showVerification && (
+              <div
                 onMouseEnter={() => {
-                  setShowButton(true);
+                  setShowVerification(true);
                   clearTimeout(buttonTimer.current!);
                 }}
-                onMouseLeave={() => setShowButton(false)}
-                onClick={() => {
-                  // Handle button click logic here
-                  console.log("Button clicked");
-                }}
+                onMouseLeave={() => setShowVerification(false)}
                 style={{
-                  cursor: "pointer",
-                  border: "0",
-                  borderRadius: "4px",
-                  margin: 0,
-                  width: "180px",
-                  padding: "10px 0px",
-                  transition: "0.4s",
-                  textAlign: "center",
                   position: "absolute",
-                  top: "-50px",
-                  left: "25%",
-                  transform: "translateX(-50%)",
-                  ...props.style,
+                  bottom: "100%",
+                  marginBottom: "20px",
+                  left: "50%",
+                  transform: "translateX(-55%)",
+                  width: "250px",
+                  backgroundColor: "#fff",
+                  borderRadius: "5px",
+                  boxShadow: "0px 2px 8px rgba(100, 111, 203, 0.6)",
+                  padding: "10px",
+                  zIndex: "1",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
                 }}
               >
-                {`Verifică ${props.tag}`}
-              </button>
+                <Typography style={{ marginTop: "10px" }}>
+                  Nu ai{" "}
+                  {props.tag.toLowerCase() === "email"
+                    ? "email-ul"
+                    : props.tag.toLowerCase()}{" "}
+                  verificat
+                </Typography>
+                <AutenticationButtons
+                  buttonText={`Trimite-mi codul`}
+                  buttonWidth={"120px"}
+                  style={{ height: "40px", marginTop: "20px" }}
+                  onClick={() => setEmailOrPhone(props.tag)}
+                />
+                {validateEmail && (
+                  <span
+                    style={{
+                      fontStyle: "italic",
+                      fontSize: "16px",
+                      textAlign: "center",
+                      marginTop: "15px",
+                    }}
+                  >
+                    Ți-am trimis un email de verificare
+                  </span>
+                )}
+                {validatePhone && (
+                  <ValidateInput
+                    tag={props.tag}
+                    code={code}
+                    setCode={setCode}
+                    handleValidate={handleValidate}
+                  />
+                )}
+              </div>
             )}
           </div>
 
-          <EditTwoToneIcon style={{ color: "#646FCB" }} />
+          {edit === false ? (
+            <NoHoverIconButton
+              onClick={() => setEdit(true)}
+              style={{ width: "30px", height: "30px" }}
+            >
+              <EditTwoToneIcon style={{ color: "#646FCB" }} />
+            </NoHoverIconButton>
+          ) : (
+            <div>
+              <NoHoverIconButton
+                style={{ width: "30px", height: "30px" }}
+                onClick={() => setEdit(false)}
+              >
+                <ClearIcon style={{ color: "#646FCB" }} />
+              </NoHoverIconButton>
+              <NoHoverIconButton
+                style={{ width: "30px", height: "30px" }}
+                onClick={() => updateUserInfo(props.index, editValue)}
+              >
+                <CheckIcon style={{ color: "#646FCB" }} />
+              </NoHoverIconButton>
+            </div>
+          )}
         </div>
       </div>
       {!props.disableLine && (
@@ -196,30 +452,22 @@ const ProfileData = (props: ProfileDataProps) => {
           }}
         />
       )}
+      <Snackbar
+        open={!!error}
+        autoHideDuration={4000}
+        message={error}
+        onClose={handleCloseSnackbar}
+        TransitionComponent={Slide}
+        TransitionProps={{ timeout: 500 }}
+      >
+        <Alert severity="error" onClose={handleCloseSnackbar}>
+          <AlertTitle>Error</AlertTitle>
+          {error}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
-
-const bounceAnimation = keyframes`
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-`;
-
-const BouncingIcon = styled("span")`
-  display: inline-block;
-  animation: ${bounceAnimation} 1.5s infinite;
-`;
-
-const ScrollableContainer = styled(Box)`
-  overflow: auto;
-`;
 
 const ProfileCard = (props: ProfileCardProps) => {
   const [expanded, setExpanded] = useState(false);
@@ -267,8 +515,6 @@ const ProfileCard = (props: ProfileCardProps) => {
   );
 };
 
-const test = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-
 interface ReviewsAndQuestions {
   title: string;
   comment: string;
@@ -305,6 +551,7 @@ export const UserProfile = () => {
     setChannelId,
   } = useContext(UserContext);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [reviews, setReviews] = useState<ReviewsAndQuestions[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -403,6 +650,40 @@ export const UserProfile = () => {
 
   const handleCloseSnackbar = () => {
     setError(null);
+    setSuccess(null);
+  };
+
+  const displayAddress = (address: Address) => {
+    let niceAddress = address.address ?? "";
+    if (address.addressAditionally !== "" && address.addressAditionally) {
+      niceAddress = niceAddress + ", " + address.addressAditionally;
+    }
+    if (address?.country !== "" && address.country) {
+      niceAddress = niceAddress + ", " + address.country;
+    }
+    if (address?.region !== "" && address.region) {
+      niceAddress = niceAddress + ", " + address.region;
+    }
+    if (address?.city !== "" && address.city) {
+      niceAddress = niceAddress + ", " + address.city;
+    }
+    if (address?.postalCode !== "" && address.postalCode) {
+      niceAddress = niceAddress + ", " + address.postalCode;
+    }
+
+    return niceAddress;
+  };
+
+  const deleteAccount = async () => {
+    try {
+      await closeAccount();
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      window.location.href = "/";
+    } catch (ex: any) {
+      console.log(ex);
+      setError("Ceva nu a mers, încearca din nou mai târziu");
+    }
   };
 
   return (
@@ -421,7 +702,7 @@ export const UserProfile = () => {
                 backgroundColor: "white",
                 borderRadius: "5px",
                 width: "480px",
-                height: "480px",
+                height: "530px",
                 maxWidth: "520px",
                 maxHeight: "540px",
                 boxShadow: "0px 0px 10px rgba(100, 111, 203, 0.6)",
@@ -467,19 +748,38 @@ export const UserProfile = () => {
                   </Avatar>
                 )}
               </div>
-              <ProfileData tag="First name" text={userData.firstName} />
-              <ProfileData tag="Last name" text={userData.lastName} />
-              <ProfileData tag="Username" text={userData.firstName} />
               <ProfileData
+                index={1}
+                tag="First name"
+                text={userData.firstName}
+              />
+              <ProfileData index={2} tag="Last name" text={userData.lastName} />
+              <ProfileData index={3} tag="Username" text={userData.userName} />
+              <ProfileData
+                index={4}
                 tag="Email"
                 text={userData.email}
                 isVerified={userData.isEmailVerified}
               />
               <ProfileData
-                tag="Numărul de telefon"
+                index={5}
+                tag="Telefon"
                 text={userData.phoneNumber}
                 isVerified={userData.isPhoneNumberVerified}
               />
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <AutenticationButtons
+                  onClick={deleteAccount}
+                  buttonText={"Închide cont"}
+                  className="deleteButton"
+                  style={{
+                    width: "50%",
+                    marginTop: "10px",
+                    backgroundColor: "#ff1a1a",
+                    color: "white",
+                  }}
+                />
+              </div>
             </Box>
           </Grid>
           <Grid item>
@@ -521,7 +821,12 @@ export const UserProfile = () => {
                 >
                   20% orice produs
                 </Typography>
-                <NoHoverIconButton>
+                <NoHoverIconButton
+                  onClick={() => {
+                    navigator.clipboard.writeText("HADEBA");
+                    setSuccess("Copiat");
+                  }}
+                >
                   <ContentCopyOutlinedIcon style={{ color: "#646FCB" }} />
                 </NoHoverIconButton>
               </div>
@@ -571,11 +876,15 @@ export const UserProfile = () => {
                         justifyContent: "start",
                       }}
                     >
-                      {address.country}, {address.region}, {address.city},{" "}
-                      {address.address}, {address.addressAditionally},{" "}
-                      {address.postalCode}
+                      {displayAddress(address)}
                     </Typography>
-                    <NoHoverIconButton style={{ justifyContent: "end" }}>
+                    <NoHoverIconButton
+                      onClick={() => {
+                        navigator.clipboard.writeText(displayAddress(address));
+                        setSuccess("Copiat");
+                      }}
+                      style={{ justifyContent: "end" }}
+                    >
                       <ContentCopyOutlinedIcon style={{ color: "#646FCB" }} />
                     </NoHoverIconButton>
                   </div>
@@ -925,6 +1234,19 @@ export const UserProfile = () => {
         <Alert severity="error" onClose={handleCloseSnackbar}>
           <AlertTitle>Error</AlertTitle>
           {error}
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={!!success}
+        autoHideDuration={4000}
+        message={success}
+        onClose={handleCloseSnackbar}
+        TransitionComponent={Slide}
+        TransitionProps={{ timeout: 500 }}
+      >
+        <Alert severity="success" onClose={handleCloseSnackbar}>
+          <AlertTitle>Success</AlertTitle>
+          {success}
         </Alert>
       </Snackbar>
     </Grid>

@@ -11,7 +11,7 @@ type ProductContextProps = {
   children: React.ReactNode;
 };
 
-interface Review {
+export interface Review {
   firstName: string;
   lastName: string;
   comment: string;
@@ -23,7 +23,7 @@ interface Review {
   hasBoughtProduct: boolean;
 }
 
-interface Comment {
+export interface Comment {
   firstName: string;
   lastName: string;
   comment: string;
@@ -167,6 +167,7 @@ export const ProductContextProvider = ({ children }: ProductContextProps) => {
           start: null,
           limit: null,
           productName: null,
+          categoryId: null,
         });
 
         const responseData = response.data.responseData;

@@ -37,7 +37,6 @@ export const loginUser = async (
 };
 
 export const logoutUser = async () => {
-  console.log(localStorage.getItem("accessToken"));
   const response = await axios.post(
     `${ApiUrls.logout}`,
     {},

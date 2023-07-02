@@ -4,6 +4,7 @@ import "./CustomButtons.css";
 interface AuthButtonProps {
   buttonText: string;
   buttonWidth?: string | number;
+  className?: string;
   type?: "button" | "submit" | "reset";
   onClick?: () => void;
   style?: CSSProperties;
@@ -14,7 +15,7 @@ interface AuthButtonProps {
 export const AutenticationButtons = (props: AuthButtonProps) => {
   return (
     <button
-      className="authentication-button"
+      className={props.className ? props.className : "authentication-button"}
       type={props.type}
       onClick={props.onClick}
       onMouseEnter={() => props.onMouseEnter}
