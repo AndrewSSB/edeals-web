@@ -7,6 +7,7 @@ interface ProductsProps {
   limit: number | null;
   productName: string | null;
   categoryId: number | null;
+  orderByPrice: boolean | null;
 }
 
 interface FavoriteProps {
@@ -27,6 +28,10 @@ export const getProducts = async (props: ProductsProps) => {
 
   if (props.categoryId) {
     apiUrl += `categoryId=${props.categoryId}&`;
+  }
+
+  if (props.orderByPrice === true || props.orderByPrice === false) {
+    apiUrl += `orderByPrice=${props.orderByPrice}&`;
   }
 
   const response = await axios.get(`${apiUrl}`, {

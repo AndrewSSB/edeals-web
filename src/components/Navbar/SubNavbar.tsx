@@ -1,9 +1,15 @@
 import { Card, CardContent, Toolbar, Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useContext, useEffect, useState } from "react";
+import {
+  CSSProperties,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import VerifiedTwoToneIcon from "@mui/icons-material/VerifiedTwoTone";
 import { CategoriesDropdown } from "./CategoriesDropdown";
-import { ProductContext } from "../../context/ProductsContext";
+import { Category, ProductContext } from "../../context/ProductsContext";
 import {
   NoHoverIconButton,
   SearchContainer,
@@ -23,6 +29,8 @@ import "../UserProfile/UserProfile.css";
 
 interface SubNavBarProps {
   onClick: (value: number) => void;
+  categoryId?: number;
+  removeCategory: () => void;
 }
 
 interface UserInfo {
@@ -33,6 +41,37 @@ interface UserInfo {
   isEmailVerified: boolean;
   phoneNumber: string;
   isPhoneNumberVerified: boolean;
+}
+
+function findCategoryName(
+  categories: Category[],
+  categoryId?: number
+): string | undefined {
+  if (!categoryId) {
+    return undefined;
+  }
+
+  const findCategory = (
+    categoryList: Category[],
+    id: number
+  ): Category | undefined => {
+    for (const category of categoryList) {
+      if (category.categoryId === id) {
+        return category;
+      }
+      if (category.subCategories) {
+        const foundCategory = findCategory(category.subCategories, id);
+        if (foundCategory) {
+          return foundCategory;
+        }
+      }
+    }
+    return undefined;
+  };
+
+  const foundCategory = findCategory(categories, categoryId);
+
+  return foundCategory?.categoryName;
 }
 
 export const SubNavBar = (props: SubNavBarProps) => {
@@ -180,15 +219,21 @@ export const SubNavBar = (props: SubNavBarProps) => {
             </div>
           )}
         </div>
-        <span
-          style={{
-            fontSize: "18px",
-            fontWeight: " 400",
-            marginLeft: "50%",
-          }}
-        >
-          Filtre
-        </span>
+        {props.categoryId && (
+          <GenericHover
+            onClick={props.removeCategory}
+            style={{ marginLeft: "50px" }}
+          >
+            <span
+              style={{
+                fontSize: "18px",
+                fontWeight: " 400",
+              }}
+            >
+              {findCategoryName(categories, props.categoryId)}
+            </span>
+          </GenericHover>
+        )}
       </Toolbar>
       {localStorage.getItem("accessToken") && (
         <div>
@@ -371,6 +416,44 @@ export const UserCard = (
           )}
         </CardContent>
       </Card>
+    </div>
+  );
+};
+
+interface GenericHoverProps {
+  children: ReactNode;
+  onClick?: () => void;
+  style?: CSSProperties;
+}
+
+export const GenericHover = (props: GenericHoverProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{
+        cursor: "pointer",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        color: isHovered ? "black" : "white",
+        padding: "5px 15px",
+        borderRadius: "30px",
+        backgroundColor: isHovered ? "white" : "inherit",
+        ...props.style,
+      }}
+    >
+      {props.children}
+      {isHovered && (
+        <NoHoverIconButton
+          onClick={props.onClick}
+          style={{ height: "15px", width: "15px", marginLeft: "10px" }}
+        >
+          <ClearIcon />
+        </NoHoverIconButton>
+      )}
     </div>
   );
 };

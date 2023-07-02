@@ -686,6 +686,40 @@ export const UserProfile = () => {
     }
   };
 
+  function copyTextToClipboard(text: string): void {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      // Use Clipboard API if available
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          console.log("Text copied to clipboard");
+        })
+        .catch((error) => {
+          console.error("Error copying text to clipboard:", error);
+        });
+    } else {
+      // Fallback for older browsers
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+
+      try {
+        const successful = document.execCommand("copy");
+        const message = successful
+          ? "Text copied to clipboard"
+          : "Failed to copy text to clipboard";
+        console.log(message);
+      } catch (error) {
+        console.error("Error copying text to clipboard:", error);
+      }
+
+      document.body.removeChild(textarea);
+    }
+  }
+
   return (
     <Grid item xs={8} sm={4} md={3} lg={2}>
       <div style={{ backgroundColor: "#F7F7F7", minHeight: "100vh" }}>
@@ -822,10 +856,7 @@ export const UserProfile = () => {
                   20% orice produs
                 </Typography>
                 <NoHoverIconButton
-                  onClick={() => {
-                    navigator.clipboard.writeText("HADEBA");
-                    setSuccess("Copiat");
-                  }}
+                  onClick={() => copyTextToClipboard("HAIDEBA")}
                 >
                   <ContentCopyOutlinedIcon style={{ color: "#646FCB" }} />
                 </NoHoverIconButton>
@@ -879,10 +910,9 @@ export const UserProfile = () => {
                       {displayAddress(address)}
                     </Typography>
                     <NoHoverIconButton
-                      onClick={() => {
-                        navigator.clipboard.writeText(displayAddress(address));
-                        setSuccess("Copiat");
-                      }}
+                      onClick={() =>
+                        copyTextToClipboard(displayAddress(address))
+                      }
                       style={{ justifyContent: "end" }}
                     >
                       <ContentCopyOutlinedIcon style={{ color: "#646FCB" }} />

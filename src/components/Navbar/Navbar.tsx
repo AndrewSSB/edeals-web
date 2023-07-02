@@ -194,6 +194,7 @@ export const Navbar = (props: NavBarProps) => {
       limit: null,
       productName: value,
       categoryId: null,
+      orderByPrice: null,
     });
 
     const responseData = response.data.responseData;

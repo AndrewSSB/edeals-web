@@ -168,6 +168,7 @@ export const ProductContextProvider = ({ children }: ProductContextProps) => {
           limit: null,
           productName: null,
           categoryId: null,
+          orderByPrice: null,
         });
 
         const responseData = response.data.responseData;
