@@ -18,6 +18,7 @@ import Checkout from "./components/Checkout/Checkout";
 import { useContext, useEffect } from "react";
 import { ChatContext, ChatContextProvider } from "./context/ChatContext";
 import { VerifyEmail } from "./components/UserProfile/VerifyEmailPage";
+import { Admin } from "./components/Admin/Admin";
 
 const App = () => {
   return (
@@ -37,6 +38,7 @@ const App = () => {
             path="/api/authentication/confirm-email/*"
             element={<VerifyEmail />}
           />
+          <Route path="/dashboard" element={<Admin />} />
           {/* <Route path="/test" element={<Test />} /> */}
           {/* <Route path="/agora" element={<AgoraChat />} /> */}
           {/* <Route path="/chat" element={<ChatComponent />} /> */}

@@ -1,4 +1,4 @@
-import { CSSProperties, useContext, useState } from "react";
+import { CSSProperties, useContext, useEffect, useState } from "react";
 import { Navbar } from "../Navbar/Navbar";
 import { SubNavBar } from "../Navbar/SubNavbar";
 import { Box } from "@mui/material";
@@ -12,8 +12,12 @@ interface WelcomePageProps {}
 
 export const WelcomePage = () => {
   const [categoryId, setCategoryId] = useState<number>();
-  const { products, setProducts } = useContext(ProductContext);
+  const [copyProducts, setCopyProducts] = useState<Product[]>([]);
   const [clickCount, setClickCount] = useState(0);
+
+  useEffect(() => {
+    handleSearch(null, null);
+  }, []);
 
   const searchByCategory = async (categoryId: number) => {
     await handleSearch(categoryId, null);
@@ -39,7 +43,7 @@ export const WelcomePage = () => {
 
       const responseData = response.data.responseData;
 
-      setProducts(responseData.data);
+      setCopyProducts(responseData.data);
       if (categoryId) {
         setCategoryId(categoryId);
       }
@@ -128,7 +132,7 @@ export const WelcomePage = () => {
         {getArrowIcon("dupa preț")}
       </div>
 
-      <ProductPage products={products} />
+      <ProductPage products={copyProducts} />
     </Box>
   );
 };
