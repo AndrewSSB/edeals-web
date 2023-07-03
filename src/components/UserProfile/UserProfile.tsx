@@ -782,12 +782,8 @@ export const UserProfile = () => {
                   </Avatar>
                 )}
               </div>
-              <ProfileData
-                index={1}
-                tag="First name"
-                text={userData.firstName}
-              />
-              <ProfileData index={2} tag="Last name" text={userData.lastName} />
+              <ProfileData index={1} tag="Prenume" text={userData.firstName} />
+              <ProfileData index={2} tag="Nume" text={userData.lastName} />
               <ProfileData index={3} tag="Username" text={userData.userName} />
               <ProfileData
                 index={4}

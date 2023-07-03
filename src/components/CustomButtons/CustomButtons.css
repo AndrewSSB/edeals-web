@@ -13,3 +13,9 @@
   box-shadow: 0 0 20px rgba(255, 26, 26, 0.6);
   width: auto;
 }
+
+.unblockButton:hover {
+  color: white;
+  box-shadow: 0 0 20px rgba(26, 255, 26, 0.8);
+  width: auto;
+}

@@ -37,6 +37,11 @@ type apiUrls = {
   validatePhone: string;
   updateUser: string;
   deleteAccount: string;
+
+  deleteProduct: string;
+  blockUser: string;
+  unblockUser: string;
+  getUsersAdmin: string;
 };
 
 export const ApiUrls: apiUrls = {
@@ -49,11 +54,15 @@ export const ApiUrls: apiUrls = {
   validatePhone: `${process.env.REACT_APP_BASE_API_URL}/core/api/authentication/confirm-phone`,
   userInfo: `${process.env.REACT_APP_BASE_API_URL}/core/api/user/info`,
   getUsers: `${process.env.REACT_APP_BASE_API_URL}/core/api/user/all`,
+  getUsersAdmin: `${process.env.REACT_APP_BASE_API_URL}/core/api/user/admin-all`,
   updateUser: `${process.env.REACT_APP_BASE_API_URL}/core/api/user`,
   deleteAccount: `${process.env.REACT_APP_BASE_API_URL}/core/api/user/account`,
+  blockUser: `${process.env.REACT_APP_BASE_API_URL}/core/api/user/block`,
+  unblockUser: `${process.env.REACT_APP_BASE_API_URL}/core/api/user/unblock`,
 
   getProducts: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/product/all`,
   getProduct: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/product`,
+  deleteProduct: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/product`,
 
   addFavorite: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/favorites`,
   deleteFavorite: `${process.env.REACT_APP_BASE_API_URL}/catalog/api/favorites`,

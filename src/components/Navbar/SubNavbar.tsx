@@ -33,7 +33,7 @@ interface SubNavBarProps {
   removeCategory: () => void;
 }
 
-interface UserInfo {
+export interface UserInfo {
   firstName: string;
   lastName: string;
   userName: string;
@@ -41,6 +41,7 @@ interface UserInfo {
   isEmailVerified: boolean;
   phoneNumber: string;
   isPhoneNumberVerified: boolean;
+  userId: string;
 }
 
 function findCategoryName(
@@ -307,6 +308,7 @@ export const SubNavBar = (props: SubNavBarProps) => {
                 phoneNumber={item.phoneNumber}
                 isPhoneNumberVerified={item.isPhoneNumberVerified}
                 handleOnClick={handleOnClick}
+                userId={item.userId}
               />
             );
           })}

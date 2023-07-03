@@ -117,6 +117,16 @@ export const getUsers = async (username: string | null) => {
   return response;
 };
 
+export const getUsersAdmin = async () => {
+  const response = await axios.get(ApiUrls.getUsersAdmin, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+  });
+
+  return response;
+};
+
 export const sendEmailVerificationCode = async () => {
   const response = await axios.post(
     `${ApiUrls.sendEmailCode}`,
@@ -162,6 +172,34 @@ export const sendPhoneVerificationCode = async () => {
 export const confirmPhoneNumber = async (digitCode: string) => {
   const response = await axios.post(
     `${ApiUrls.validatePhone}/${digitCode}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
+
+  return response;
+};
+
+export const blockUser = async (id: string) => {
+  const response = await axios.post(
+    `${ApiUrls.blockUser}/${id}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
+
+  return response;
+};
+
+export const unblockUser = async (id: string) => {
+  const response = await axios.post(
+    `${ApiUrls.unblockUser}/${id}`,
     {},
     {
       headers: {

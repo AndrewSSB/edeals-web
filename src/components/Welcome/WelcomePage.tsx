@@ -1,7 +1,7 @@
 import { CSSProperties, useContext, useEffect, useState } from "react";
 import { Navbar } from "../Navbar/Navbar";
 import { SubNavBar } from "../Navbar/SubNavbar";
-import { Box } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { ProductPage } from "../Products/ProductPage";
 import { Product, ProductContext } from "../../context/ProductsContext";
 import { createOrder, getProducts } from "../../API/products";
@@ -14,21 +14,33 @@ export const WelcomePage = () => {
   const [categoryId, setCategoryId] = useState<number>();
   const [copyProducts, setCopyProducts] = useState<Product[]>([]);
   const [clickCount, setClickCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [orderByPriceBool, setOrderByPriceBool] = useState<boolean | null>(
+    null
+  );
+  const [productName, setProdctName] = useState<string | null>(null);
 
   useEffect(() => {
-    handleSearch(null, null);
+    handleSearch(null, null, null);
   }, []);
 
+  const handleNavbarSearch = async (value: string | null) => {
+    await handleSearch(value, categoryId, orderByPriceBool);
+    setProdctName(value);
+  };
+
   const searchByCategory = async (categoryId: number) => {
-    await handleSearch(categoryId, null);
+    await handleSearch(productName, categoryId, orderByPriceBool);
+    setCategoryId(categoryId);
   };
 
   const removeCategory = async () => {
     setCategoryId(undefined);
-    await handleSearch(null, null);
+    await handleSearch(productName, null, orderByPriceBool);
   };
 
   const handleSearch = async (
+    productName: string | null | undefined,
     categoryId: number | null | undefined,
     orderByPrice: boolean | null | undefined
   ) => {
@@ -36,7 +48,7 @@ export const WelcomePage = () => {
       const response = await getProducts({
         start: null,
         limit: null,
-        productName: null,
+        productName: productName === undefined ? null : productName,
         categoryId: categoryId === undefined ? null : categoryId,
         orderByPrice: orderByPrice === undefined ? null : orderByPrice,
       });
@@ -44,10 +56,13 @@ export const WelcomePage = () => {
       const responseData = response.data.responseData;
 
       setCopyProducts(responseData.data);
-      if (categoryId) {
-        setCategoryId(categoryId);
-      }
-    } catch (ex: any) {}
+    } catch (ex: any) {
+      console.error(ex);
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+    }
   };
 
   const handleClick = () => {
@@ -56,7 +71,7 @@ export const WelcomePage = () => {
     const orderByPrice =
       clickCount + 1 === 1 ? true : clickCount + 1 === 2 ? false : null;
 
-    handleSearch(categoryId, orderByPrice);
+    handleSearch(productName, categoryId, orderByPrice);
   };
 
   const getArrowIcon = (text: string) => {
@@ -107,32 +122,71 @@ export const WelcomePage = () => {
         flexDirection: "column",
       }}
     >
-      <Navbar isInBasketPage={false} isInFavoritePage={false} />
+      <Navbar
+        isInBasketPage={false}
+        isInFavoritePage={false}
+        searchBar={handleNavbarSearch}
+      />
       <SubNavBar
         onClick={searchByCategory}
         categoryId={categoryId}
         removeCategory={removeCategory}
       />
 
-      <div
-        style={{
-          margin: "20px 0px 0px 20px",
-          height: "30px",
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-        }}
-      >
-        <span
-          onClick={handleClick}
-          style={{ cursor: "pointer", fontSize: "20px" }}
+      {!isLoading && copyProducts.length > 0 && (
+        <div
+          style={{
+            margin: "20px 0px 0px 20px",
+            height: "30px",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
         >
-          Ordonează
-        </span>
-        {getArrowIcon("dupa preț")}
-      </div>
+          <span
+            onClick={handleClick}
+            style={{ cursor: "pointer", fontSize: "20px" }}
+          >
+            Ordonează
+          </span>
+          {getArrowIcon("dupa preț")}
+        </div>
+      )}
 
-      <ProductPage products={copyProducts} />
+      {isLoading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "70vh",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <CircularProgress sx={{ color: "#646FCB" }} />
+            <Typography
+              variant="h6"
+              style={{
+                marginTop: "40px",
+                padding: "10px 0 10px 0",
+                color: "#646FCB",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              Un moment, îți încărcăm produsele
+            </Typography>
+          </div>
+        </div>
+      ) : (
+        <ProductPage products={copyProducts} />
+      )}
     </Box>
   );
 };

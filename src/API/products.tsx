@@ -279,6 +279,16 @@ export const deleteCartItem = async (id: number | string) => {
   return response;
 };
 
+export const deleteProduct = async (id: string) => {
+  const response = await axios.delete(`${ApiUrls.deleteProduct}/${id}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+    },
+  });
+
+  return response;
+};
+
 export const getCategories = async () => {
   const response = await axios.get(`${ApiUrls.categories}`, {
     headers: {

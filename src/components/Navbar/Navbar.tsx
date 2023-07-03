@@ -36,15 +36,13 @@ import { HubConnectionState } from "@microsoft/signalr";
 interface NavBarProps {
   isInBasketPage?: Boolean;
   isInFavoritePage?: Boolean;
+
+  searchBar?: (value: string | null) => void;
 }
 
 export const Navbar = (props: NavBarProps) => {
   const {
     products,
-    setProducts,
-    setPageSize,
-    setTotalPageNumber,
-    setCurrentPageNumber,
     favorites,
     setFavorites,
     shoppingSession,
@@ -189,19 +187,7 @@ export const Navbar = (props: NavBarProps) => {
   };
 
   const handleSearch = async (value: string | null) => {
-    const response = await getProducts({
-      start: null,
-      limit: null,
-      productName: value,
-      categoryId: null,
-      orderByPrice: null,
-    });
-
-    const responseData = response.data.responseData;
-    setProducts(responseData.data);
-    setPageSize(responseData.pageSize);
-    setTotalPageNumber(responseData.totalPageNumber);
-    setCurrentPageNumber(responseData.currentPageNumber);
+    props.searchBar!(value); // no sa fie null
   };
 
   const goToWelcome = () => {
